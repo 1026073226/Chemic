@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Chemic冒险</title>
+		<link rel="stylesheet" href="css/index.css">
+		<link rel="stylesheet" href="css/animate.css" loading="lazy">
+		<link rel="stylesheet" href="css/adven.css" />
+	</head>
+	<body>
+		<!-- 保持原有UI结构 -->
+		<div id="entropy-display" class="game-ui">
+			<div class="entropy-bar">
+				<span class="entropy-icon">☠</span>
+				<span class="entropy-value">0%</span>
+			</div>
+		</div>
+		<button id="pause">⏸️</button>
+		<div id="pause-menu">
+			<div id="menu-container">
+				<button class="btn" id="jam-out">脱离卡死</button>
+				<button class="btn" id="quit-game">终止实验</button>
+				<button class="btn" id="change-controls">切换控制器</button>
+				<button class="btn" id="quit-app">退出游戏</button>
+			</div>
+		</div>
+		<div id="controls">
+			<div id="current-effects">
+			</div>
+			<div class="move-group">
+				<button class="ctrl-btn" id="left">←</button>
+				<button class="ctrl-btn" id="right">→</button>
+			</div>
+			<button class="ctrl-btn" id="jump">↑</button>
+			<button class="ctrl-btn" id="spell">۞</button>
+		</div>
+		<div id="character-select" class="animate__animated animate__fadeIn">
+			<div class="character-grid"></div>
+		</div>
+		<div id="game-container"></div>
+		<div id="loadPic" style="pointer-events: none">
+			<img src="img/splash.png" />
+			<div class="htp" id="loadTp">
+			</div>
+			<span class="a" id="getIn">点击进入游戏</span>
+		</div>
+		<script src="js/public/phaser.min.js"></script>
+		<script src="js/adven/joystick.js"></script>
+		<script src="js/public/dic.js"></script>
+		<script src="js/adven/adven.js"></script>
+	</body>
+</html>

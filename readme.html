@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8">
+		<title>Chemic 化学卡牌游戏全攻略</title>
+		<link href="css/index.css" rel="stylesheet" />
+		<style>
+			html, body {
+				margin: 0;
+				overflow: auto;
+			}
+			body {
+				font-family: Arial, sans-serif;
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 20px
+			}
+
+			h2 {
+				color: #2196F3;
+				border-bottom: 2px solid #EEE;
+				padding-bottom: 5px
+			}
+
+			.section {
+				margin: 20px 0;
+				padding: 15px;
+				background: #F8F9FA;
+				border-radius: 8px
+			}
+
+			.warning {
+				background: #FFF3E0;
+				padding: 10px;
+				border-left: 4px solid #FFA726
+			}
+
+			code {
+				background: #F5F5F5;
+				padding: 2px 5px
+			}
+
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 10px 0
+			}
+
+			td,
+			th {
+				border: 1px solid #DDD;
+				padding: 8px
+			}
+		</style>
+	</head>
+	<body>
+
+		<h1>Chemic 完全新手攻略</h1>
+
+		<!-- 导航栏详解 -->
+		<div class="section">
+			<h2>🔧 核心导航功能</h2>
+			<p>顶部工具栏包含以下功能按钮：</p>
+			<table>
+				<tr>
+					<th>按钮图标</th>
+					<th>功能名称</th>
+					<th>操作说明</th>
+				</tr>
+				<tr>
+					<td>🔍</td>
+					<td>查看手册</td>
+					<td>查看所有元素的原子序数、价态及单质（如<code>O↔O₂</code>）、金属活性、提示；查看属性；搜索方程式；元素/器皿</td>
+				</tr>
+				<tr>
+					<td>🧫</td>
+					<td>物质冰箱</td>
+					<td>管理已合成的物质，点击可打开物质菜单，回收：换取元素力，反应：放入反应工坊，中子：中子轰击获取同位素</td>
+				</tr>
+				<tr>
+					<td>💥</td>
+					<td>反应工坊</td>
+					<td>组合物质进行化学反应，显示环境参数，点物质收回，点等号反应，点环境切换</td>
+				</tr>
+				<tr>
+					<td>📖</td>
+					<td>数据中心</td>
+					<td>查看实时熵与更多设置</td>
+				</tr>
+				<tr>
+					<td>💰</td>
+					<td>量子商店</td>
+					<td>购买元素和属性加成</td>
+				</tr>
+				<tr>
+					<td>🌠</td>
+					<td>元素置换</td>
+					<td>购买晶体和抽取元素与器皿</td>
+				</tr>
+				<tr>
+					<td>🎁</td>
+					<td>粒子增量</td>
+					<td>可消耗手牌中的指定元素进行交换</td>
+				</tr>
+			</table>
+		</div>
+		<!-- 核心反应流程 -->
+		<div class="section">
+			<h2>⚗️ 化学反应操作指南</h2>
+			<h3>普通反应示例（制备水）</h3>
+			<ol>
+				<li>点击“下回”</li>
+				<li>点击底部手牌中的<code>H</code>（重复两次）</li>
+				<li>在中央出现<code>H₂</code>时，点击制取</li>
+				<li>点击底部手牌中的<code>O</code>（重复两次）</li>
+				<li>在中央出现<code>O₂</code>时，点击制取</li>
+				<li>点击🧫，查看刚刚制取的物质（假设现在已制取数个<code>H₂</code>和一个<code>O₂</code></li>
+				<li>点击<code>H₂</code>，弹出菜单</li>
+				<li>点击回收</li>
+				<li>得到元素力</li>
+				<li>若干回合后，假设你的元素力已足以反应</li>
+				<li>点击🧫</li>
+				<li>点击<code>H₂</code>，点击反应</li>
+				<li>(以此类推)</li>
+				<li>点击💥</li>
+				<li>检查方程式是否正确</li>
+				<li>点击=</li>
+				<li>右边出现2<code>H₂O</code>，弹窗提示：[红色放热/蓝色吸热]“反应熵（实际造成熵）”</li>
+				<li>点击2<code>H₂O</code></li>
+				<li>点击🧫，可以看到<code>H₂O</code>已经在里面了</li>
+				<li>点击📖，可以看见熵已经变化</li>
+			</ol>
+
+			<h3>核反应特殊流程</h3>
+			<ol>
+				<li>获取<code>H-2、H-3</code>氢同位素</li>
+				<li>(注：每个H每轮只能轰击一次)</li>
+				<li>核聚变反应(搜索“n”可看到方程式)获得<strong>n</strong>（中子）</li>
+				<li><code>U</code>和<code>n</code>反应触发裂变</li>
+			</ol>
+		</div>
+
+		<!-- 联机对战系统 -->
+		<div class="section">
+			<h2>🌐 联机对战说明</h2>
+			<h3>连接步骤</h3>
+			<ol>
+				<li>点击<strong>📖</strong>后点击更多进入设置</li>
+				<li>输入对方IP地址（如<code>192.168.1.100</code>）</li>
+				<li>选择作为<code>p1/p2</code>（两人必须不同）：
+				</li>
+				<li>
+					点击连接
+				</li>
+			</ol>
+			<h3>胜负判定规则</h3>
+			<ul>
+				<li>当任意玩家熵&gt;1000时游戏结束</li>
+			</ul>
+		</div>
+		<!-- 环境系统 -->
+		<div class="section">
+			<h2>🌡️ 实验环境调控</h2>
+			<table>
+				<tr>
+					<th>环境图标</th>
+					<th>名称</th>
+					<th>效果</th>
+					<th>持续时间</th>
+				</tr>
+				<tr>
+					<td>🔥</td>
+					<td>加热</td>
+					<td>放热反应效率<code>+10%</code>，吸热反应效率<code>-20%</code></td>
+					<td>3回合</td>
+				</tr>
+				<tr>
+					<td>☢️</td>
+					<td>辐射</td>
+					<td>反应效率<code>+50%</code>，反应成功率<code>-50%</code>，生成物有概率变异</td>
+					<td>1回合</td>
+				</tr>
+			</table>
+			<p>切换方式：在反应工坊（💥界面）点击环境图标或进行特定反应（如核裂变反应造成辐射），更多环境请自行探索吧~</p>
+		</div>
+		<div class="section">
+			<h2>❤️元素培养/器皿:</h2>
+			<br />
+			1.制取对应的元素
+			<br />
+			2.点击🔍
+			<br />
+			3.点击“元素”
+			<br />
+			4.选择对应元素
+			<br />
+			5.点击元素头像
+			<br />
+			6.每级效果:
+			<br />
+			<li>略微增加刷新概率</li>
+			<li>增加含该元素的反应成功率</li>
+			<li>反应物含<code>Hg</code>时无法生效</li>
+			7.器皿效果:
+			<br />
+			<li>增加反应成功率，反应效率</li>
+			<li>特殊效果</li>
+		</div>
+		<!-- 设置与高级功能 -->
+		<div class="section">
+			<h2>⚙️ 系统设置</h2>
+			<h3>设置项调整（在⚙️里点击更多）</h3>
+		</div>
+		<div class="section">
+			<h2>🧿 模组</h2>
+			<h3>⚙️-更多-安装模组</h3>
+			<li>
+				安装前请自行检查模组安全性，非官方模组出现问题概不负责
+			</li>
+			<li>
+				点击模组列表中的模组以禁用/启用模组
+			</li>
+			<li>
+				长按模组列表中的模组以删除模组
+			</li>
+		</div>
+		<div class="section">
+			<h2>ℹ️信息栏</h2>
+			<code>
+				回合：1 <code>0/0</code> <code>0/15</code>
+				任务：CaO 7元素力
+			</code>
+			<ul>
+				<li>“回合：1”: 当前回合数为1</li>
+				<li>“<code>0/0</code>”: p1熵值/p2熵值</li>
+				<li>“<code>0/15</code>”: 当前元素力/反应所需元素力</li>
+				<li>“任务：CaO”: 任务是制取CaO</li>
+				<li>“7元素力”: 任务奖励7元素力</li>
+			</ul>
+		</div>
+		<div class="section">
+			<h2>💡Tips:</h2>
+			<br />
+			1. 制作化合物时，若顺序有误，则无法正常进行反应,如：<code>CCaO<sub>3</sub></code>(实际上正确顺序应为<code>CaCO<sub>3</sub></code>)
+			<br />
+			2. 不要同时打开多个页面，可能有Bug！
+			<br />
+			3. 建议放入元素数量最好不要超过20个，否则……
+			<br />
+			4.
+			搜索以“元素<code>a</code>+元素<code>b</code>……+元素<code>c*n</code>”的形式进行，如：搜索氢气与氧气参与的反应可搜索“<code>H*2</code>+<code>O*2</code>”
+			<br />
+			5.
+			点击结果方程式等号可以自动配平
+			<br />
+			6.
+			快速开关元素菜单会产生Bug，再次尝试快速开关有概率修复Bug
+		</div>
+
+	</body>
+</html>

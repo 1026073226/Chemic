@@ -1,0 +1,1105 @@
+:root {
+	--font: "consola";
+	--fz: 100%;
+}
+
+@keyframes move {
+
+	0%,
+	50%,
+	100% {
+		transform: translateX(0px);
+		opacity: 0.4;
+	}
+
+	25% {
+		transform: translateX(20px);
+		opacity: 0.5;
+	}
+
+	75% {
+		transform: translateX(-20px);
+		opacity: 0.5;
+	}
+}
+
+@keyframes blink {
+	0% {
+		opacity: 1;
+	}
+
+	10% {
+		opacity: 1;
+	}
+
+	50% {
+		opacity: 0;
+	}
+
+	80% {
+		opacity: 1;
+	}
+}
+
+@keyframes slideout {
+	0% {
+		opacity: 0;
+	}
+
+	100% {
+		opacity: 1;
+	}
+}
+
+@keyframes slidein {
+	0% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
+}
+
+@keyframes jslideout {
+	0% {
+		transform: scale(0);
+		opacity: 0;
+	}
+
+	100% {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+@keyframes jslidein {
+	0% {
+		transform: scale(1);
+		opacity: 1;
+	}
+
+	100% {
+		transform: scale(0);
+		opacity: 0;
+		width: 0;
+	}
+}
+
+@keyframes clicked {
+	0% {
+		transform: scale(1);
+	}
+
+	20% {
+		transform: scale(1.025);
+	}
+
+	80% {
+		transform: scale(0.95);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
+@keyframes empty {
+	100% {
+		transform: scale(1);
+	}
+}
+
+body {
+	background-color: #fff;
+	transition:
+		background-color 386ms,
+		color 386ms,
+		opacity 881ms;
+	will-change:
+		background-color, color, opacity;
+}
+
+@font-face {
+	font-family: "consola";
+	src: url("../font/consola.ttf");
+}
+
+@font-face {
+	font-family: "silver";
+	src: url("../font/silver.ttf");
+}
+
+@font-face {
+	font-family: "emoji";
+	src: url("../font/seguiemj.ttf");
+}
+
+* {
+	outline: none;
+	user-select: none;
+	font-family: var(--font), "emoji";
+	font-size: var(--fs);
+}
+
+html,
+body,
+#app {
+	height: 100vh;
+	width: 100vw;
+	margin: 0;
+	padding: 0;
+	scroll-behavior: smooth;
+	overflow: hidden;
+}
+
+input[type="range"] {
+	appearance: none;
+	width: 90%;
+	height: 0px;
+	margin: 10px 0;
+	background-color: none;
+}
+
+.switch {
+	position: relative;
+	display: inline-block;
+	width: 50px;
+	height: 25px;
+}
+
+.switch input {
+	display: none;
+}
+
+.switch .slider {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	transition: 0.4s;
+	border-radius: 34px;
+}
+
+.switch .slider:before {
+	position: absolute;
+	content: "";
+	height: 21px;
+	width: 21px;
+	left: 2px;
+	bottom: 2px;
+	background-color: white;
+	transition: 0.4s;
+	border-radius: 50%;
+}
+
+.switch input:checked+.slider {
+	background-color: #2196f3;
+}
+
+.switch input:checked+.slider:before {
+	transform: translateX(26px);
+}
+
+#app #topline {
+	background-color: rgba(200, 200, 200, 0.4);
+	backdrop-filter: blur(5px);
+	height: 40px;
+	width: 100%;
+	border-radius: 2.5px;
+	box-shadow: 0 0 5px #AAA;
+	position: fixed;
+	top: 0;
+	z-index: 12;
+}
+
+.fullBtn {
+	width: calc(100% - 20px);
+	margin-left: 10px;
+	margin-right: 10px;
+	color: #FFFFFF;
+	font-weight: 400;
+	border: 1.5px solid #EEE;
+	box-shadow: 0px 1px 5px #AFEEFF;
+	border-radius: 5px;
+	font-size: 24px;
+	background-color: #FA8;
+	text-shadow: 0 0 5px #FDB;
+}
+
+#handbook,
+#reaction,
+#fty,
+#h,
+#shop,
+#draw,
+#ballm {
+	width: calc(100% - env(safe-area-inset-left));
+	height: 100vh;
+	overflow: auto;
+	background-color: rgba(30, 30, 30, 0.6);
+	backdrop-filter: blur(5px);
+	padding-top: 50px;
+	z-index: 10;
+	margin-left: env(safe-area-inset-left);
+	position: relative;
+}
+#ballm {
+	padding: 0;
+	margin: 0;
+}
+#ballm canvas {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 11;
+}
+
+/* 添加DOM元素的样式 */
+#ballm div {
+	position: absolute;
+	pointer-events: none;
+	z-index: 100;
+}
+
+/* 隐藏Webkit浏览器滚动条 */
+*::-webkit-scrollbar {
+	display: none;
+}
+
+#handbook .notes,
+.hand .brand,
+#reaction .notes,
+#shop .notes,
+.madesMenu {
+	display: inline-block;
+	height: 100px;
+	width: calc(10% - 6px);
+	margin: 0.5px;
+	border: 1.5px solid #555;
+	border-radius: 5px;
+	float: left;
+	background-color: #AAA;
+	padding: 1px;
+	transform: translateZ(0);
+	will-change: transform;
+	backface-visibility: hidden;
+
+}
+
+.hand .brand {
+	/*transition: transform 186ms,
+  opacity 186ms,
+  width: 186ms;*/
+	will-change: max-width, transform;
+}
+
+.notes b,
+.ress b {
+	font-size: 150%;
+	color: #FFF;
+	margin-left: 0.5em;
+	text-shadow: 0 0 5px #FFF;
+}
+
+.notes .v,
+.a {
+	font-size: 75%;
+	color: #DDD;
+}
+
+.notes .a {
+	float: left;
+}
+
+#handbook .notes .v {
+	width: 100%;
+	float: left;
+	word-wrap: break-word;
+}
+
+#handbook p {
+	color: #FFF;
+	text-shadow: 0px 2px 5px #FFF;
+}
+
+#app #bottomline {
+	padding: 1.5px;
+	padding-top: 0;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	height: 120px;
+	z-index: 1;
+	overflow: hidden;
+	border-radius: 5px;
+	box-shadow: 0 -1px 5px #CCC;
+	background-color: #DEE;
+	opacity: 0.9;
+	transition: height 647ms;
+	will-change: height;
+}
+
+.hand {
+	white-space: nowrap;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	height: 100%;
+	width: 100%;
+}
+
+#bgi {
+	opacity: 0.2;
+	width: 100%;
+	height: 122px;
+	z-index: -1;
+	position: fixed;
+	bottom: 0;
+	overflow: hidden;
+	background-image: url(../img/iron.webp);
+	background-repeat: repeat-x;
+	/* 横向重复 */
+	background-size: auto 100%;
+	/* 纵向拉伸 */
+	background-position: 0 0;
+	filter: blur(8px);
+}
+
+.hand .brand {
+	display: inline-block;
+	height: 100px;
+	width: calc(10% - 10px);
+	margin: 1px;
+	border: 1.5px solid #555;
+	border-radius: 5px;
+	background-color: #DDD;
+	box-shadow: 0 1px 5px #AAA;
+	animation: jslideout 486ms;
+}
+
+.hand .brand b {
+	width: 100%;
+	height: 100%;
+	line-height: 100px;
+	text-align: center;
+	color: #FFF;
+	text-shadow: 0 0 5px #FFF;
+	display: block;
+	pointer-events: none;
+}
+
+#bodyline {
+	position: fixed;
+	top: 50px;
+	width: 100%;
+	height: calc(100vh - 280px);
+	z-index: 1;
+}
+
+#bodyline #area {
+	width: 100%;
+	height: 100%;
+	padding-left: env(safe-area-inset-left);
+}
+
+#bodyline #area b {
+	display: block;
+	width: 100%;
+	text-align: center;
+	font-size: 500%;
+	line-height: 50vh;
+	height: 0;
+}
+
+#bodyline #area button,
+.btn {
+	width: 55px;
+	height: 25px;
+	line-height: 22px;
+	color: #FFFFFF;
+	font-weight: 400;
+	border: 1.5px solid #EEE;
+	box-shadow: 0px 1px 5px #AFEEFF;
+	border-radius: 5px;
+	font-size: 15px;
+}
+
+.mades {
+	will-change: width;
+}
+
+#reaction span,
+#env span {
+	color: #FFF;
+	text-shadow: 0px 1px 5px #FFF;
+}
+
+.n {
+	font-size: 150%;
+	color: #EEE;
+	font-weight: 300;
+	text-shadow: 0 0 3px #FFF;
+}
+
+#fty .notes {
+	padding: 0;
+	margin: 0;
+	display: inline;
+	text-align: left;
+}
+
+#handbook .ress {
+	padding: 0;
+	margin: 0;
+	display: inline;
+	text-align: left;
+}
+
+#fty {
+	overflow: scroll;
+	white-space: nowrap;
+}
+
+.eq {
+	font-size: 250%;
+	color: #AFFFFF;
+	text-shadow: 0px 2px 5px #FFF;
+	font-weight: 300;
+	height: 50px;
+	line-height: 50px;
+}
+
+#rounds {
+	display: block;
+	position: fixed;
+	top: 50%;
+	bottom: 50%;
+	color: #FFAFAF;
+	font-weight: 800;
+	right: 0;
+	text-shadow: 0px 1px 5px #CCC;
+	z-index: 9;
+	height: 3em;
+	background-color: rgba(168, 168, 168, 0.4);
+	backdrop-filter: blur(3px);
+	border-radius: 5px;
+	padding: 1px;
+	pointer-events: none;
+	margin-left: env(safe-area-inset-left);
+	opacity: 0.8;
+}
+
+#h1 {
+	color: #FE6565;
+	font-size: 135%;
+	text-shadow: 0 -2px 5px red;
+}
+
+#h2 {
+	color: #6565FE;
+	font-size: 135%;
+	text-shadow: 0 -2px 5px blue;
+}
+
+hr {
+	border: 1px solid #FFF;
+	background-color: #FFF;
+}
+
+i {
+	position: fixed;
+	top: 55vh;
+	color: #6565FE;
+	text-shadow: 1px 1px 3px blue;
+}
+
+input,
+.select,
+.file {
+	border: none;
+	border-bottom: 1px solid #AAA;
+	padding: 2px;
+	background-color: rgba(0, 0, 0, 0);
+	color: #FFF;
+}
+
+input,
+.file {
+	width: 100px;
+	transition:
+		border-width 238ms,
+		font-weight 238ms,
+		border-color 238ms,
+		padding 238ms;
+}
+
+.select {
+	width: 50px;
+	position: relative;
+	bottom: 1px;
+}
+
+#connect {
+	width: 100px;
+	float: right;
+	margin: 2px;
+	border: 1px solid #FFF;
+	border-radius: 5px;
+	background-color: #65FE65;
+	color: #FFF;
+	box-shadow: 0px 1px 5px #FFF
+}
+
+.htp {
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	transition:
+		background-color 384ms;
+}
+
+button {
+	transition: background-color 398ms;
+}
+
+div {
+	transition: width 218ms;
+}
+
+.mades * {
+	white-space: nowrap;
+}
+
+.mades .notes b,
+.mades .notes span,
+.mades .notes br {
+	pointer-events: none;
+}
+
+.switch,
+.settings {
+	margin: 5px;
+	position: relative;
+	top: 5px;
+	float: right;
+}
+
+.settings {
+	border: 1px solid #FFF;
+	border-radius: 5px;
+	background-color: #F33;
+	color: #FFF;
+	transform: translate(-50%);
+	width: 50px;
+	height: 25px;
+	margin-right: -20px;
+}
+
+.setInp {
+	float: right;
+	position: relative;
+	top: 10px;
+	width: 100px;
+}
+
+input:hover,
+.file:hover {
+	border-width: 1.5px;
+	border-color: #FEA;
+	font-weight: 500;
+	padding: 3px;
+}
+
+.details {
+	max-height: 1em;
+	overflow: hidden;
+	opacity: 0.5;
+	transition: max-height 384ms,
+		opacity 384ms;
+	will-change: max-height, opacity;
+}
+
+#tip {
+	position: fixed;
+	bottom: 20%;
+	left: 50%;
+	transform: translateX(-50%);
+	min-height: 30px;
+	opacity: 0;
+	background-color: rgba(128, 128, 128, 0.5);
+	backdrop-filter: blur(10px);
+	color: #FFF;
+	box-shadow: 0px 0px 10px #666;
+	transition: opacity 386ms;
+	border-radius: 5px;
+	width: 150px;
+	text-align: center;
+	line-height: 30px;
+	padding: 2px;
+	z-index: 99999;
+	pointer-events: none;
+}
+
+#conf {
+	position: fixed;
+	bottom: 20%;
+	left: 50%;
+	transform: translateX(-50%);
+	opacity: 0;
+	background-color: rgba(128, 128, 128, 0.5);
+	backdrop-filter: blur(10px);
+	color: #FFF;
+	box-shadow: 0px 0px 10px #666;
+	transition: opacity 386ms, transform 386ms;
+	border-radius: 5px;
+	width: 200px;
+	text-align: center;
+	padding: 2px;
+	z-index: 99999;
+}
+
+#fty .notes .n,
+#fty .notes .e {
+	font-size: 25vh;
+}
+
+#fty .eq {
+	font-size: 50vh;
+}
+
+#fty .notes {
+	display: inline;
+}
+
+#search {
+	width: 40%;
+	margin: 4px;
+}
+
+.ressa {
+	height: 3em;
+	width: 100%;
+}
+
+.ressa .eq {
+	height: 5em;
+}
+
+.ress {
+	height: 3em;
+	display: inline;
+}
+
+.madesMenu {
+	border: none;
+	background-color: rgba(200, 200, 200, 0.3);
+	color: #FFF;
+	will-change: width;
+	transition: width 386ms,
+		opacity 386ms;
+	overflow: hidden;
+	opacity: 0;
+	width: 0;
+	padding: 0;
+	margin: 0;
+	min-width: 0;
+	height: 103px;
+	position: relative;
+	top: 1px;
+}
+
+.menuBtn {
+	width: calc(100% - 2px);
+	height: 25px;
+	line-height: 25px;
+	color: #FFFFFF;
+	font-weight: 400;
+	border: 1.5px solid #EEE;
+	box-shadow: 0px 1px 5px #AFEEFF;
+	border-radius: 5px;
+	margin: 1px;
+	overflow: hidden;
+}
+
+#shop .notes {
+	width: calc(20vw - 6px);
+}
+
+#background {
+	opacity: 0.3;
+	height: 100%;
+	width: 100%;
+	z-index: -1;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+#troll {
+	height: 8px;
+	width: 100%;
+	text-align: center;
+	color: #FFF;
+	line-height: 7px;
+	box-shadow: 0 1px 5px #EEE;
+	opacity: 0.5;
+	background-color: rgba(0, 0, 0, 0);
+	z-index: 9;
+	position: relative;
+	border-radius: 5px;
+}
+
+#showEle {
+	will-change: transform;
+	backface-visibility: hidden;
+}
+
+#env button {
+	border-radius: 2.5px;
+	width: 16.66%;
+	margin: 0;
+	padding: 0;
+	height: 1.5em;
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	font-size: 125%;
+}
+
+.brand .n {
+	height: 0;
+	width: 0;
+	display: block;
+	overflow: visible;
+	font-size: 90%;
+	transition: font-size 384ms,
+		color 384ms;
+	color: #888;
+}
+
+.acts img {
+	height: 85vh;
+	width: 85vh;
+	position: relative;
+	z-index: 11;
+}
+
+.acts .h {
+	position: absolute;
+	top: 0;
+	left: 0;
+	opacity: 0;
+	transition: opacity 386ms;
+	will-change: opacity;
+	background-color: #444;
+	z-index: 1;
+	pointer-events: none;
+	padding-top: 50px;
+	text-align: left;
+	overflow: hidden;
+	height: 100vh;
+	width: 100vw;
+}
+
+.ressa .n {
+	transition: opacity 184ms;
+	will-change: opacity;
+}
+
+.acts .h .bg {
+	display: inline-block;
+	position: fixed;
+	bottom: 0;
+	left: -20px;
+	z-index: 1;
+	opacity: 0.5;
+	background-repeat: repeat-x;
+	background-size: auto 100%;
+	background-position: 0 0;
+	height: 100%;
+	width: calc(100% + 40px);
+	animation: move 5s infinite;
+	filter: blur(0.5px);
+}
+
+.acts button {
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	height: 85vh;
+	width: 85vh;
+	position: relative;
+	z-index: 11;
+	border-radius: 5px;
+}
+
+.acts {
+	overflow: hidden;
+	height: 100%;
+	width: 100%;
+}
+
+.acts .h .n,
+.acts .htp {
+	position: relative;
+	z-index: 1;
+}
+
+.ripple-effect {
+	position: absolute;
+	border-radius: 50%;
+	background: rgba(65, 255, 255, 0.4);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+	animation: ripple 484ms;
+}
+
+@keyframes ripple {
+	0% {
+		width: 0;
+		height: 0;
+		opacity: 0.8;
+	}
+
+	100% {
+		width: 100px;
+		height: 100px;
+		opacity: 0;
+	}
+}
+
+li {
+	color: hsl(0%, 0%, 0%);
+	opacity: 1;
+	transition: opacity 2s,
+		color 384ms;
+}
+
+.acts .sidebar {
+	width: calc(100% - 90vh);
+	position: absolute;
+	right: 10px;
+	top: 100px;
+	text-align: left;
+	display: inline-block;
+}
+
+.modSettingsContainer {
+	width: 100%;
+
+}
+
+#createdSettings {
+	background-color: rgba(255, 255, 255, 0.4);
+	border-radius: 5px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+iframe {
+	height: 100vh;
+	width: 100vw;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 5;
+	border: none;
+	background-color: rgba(255, 255, 255, 0.6);
+	backdrop-filter: blur(5px);
+	overflow: auto;
+}
+
+#present {
+	position: fixed;
+	top: 35vh;
+	right: 0;
+	font-size: 150%;
+	color: #FFF;
+	background: none;
+	border: none;
+	text-shadow: 0 1px 5px #DDD;
+	z-index: 5;
+}
+
+#present span {
+	position: relative;
+	right: 25px;
+}
+
+#ball {
+	position: fixed;
+	top: 35vh;
+	left: 0;
+	font-size: 150%;
+	color: #FFF;
+	background: none;
+	border: none;
+	text-shadow: 0 1px 5px #DDD;
+	z-index: 12;
+}
+
+#loadPic {
+	width: 100vw;
+	height: 100vh;
+	z-index: 9999;
+	position: fixed;
+	top: 0;
+	left: 0;
+	overflow: hidden;
+	background-color: #FFF;
+	transition: opacity 452ms;
+
+}
+
+#loadPic img {
+	object-fit: contain;
+	height: 90%;
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 10000;
+	opacity: 0;
+	animation: slideout 1052ms forwards;
+}
+
+#getIn {
+	position: fixed;
+	bottom: 15%;
+	z-index: 10002;
+	transition: opacity 512ms;
+	text-align: center;
+	width: 100%;
+	white-space: nowrap;
+	line-height: 1.5em;
+	color: #EEE;
+	opacity: 0;
+}
+
+#loadTp {
+	position: fixed;
+	bottom: 15%;
+	text-align: center;
+	z-index: 10001;
+	border-radius: 5px;
+	transition: width 812ms, opacity 1012ms, background-color 812ms;
+	box-shadow: 0 3px 5px #EEE;
+}
+
+.drawBtn {
+	width: calc(50% - 8px);
+	margin: 1px;
+}
+
+#draw .bg {
+	height: calc(100% - 6em - 40px);
+	width: 100%;
+	position: absolute;
+	top: calc(2em + 40px);
+	left: 0;
+	object-fit: contain;
+	z-index: -1;
+}
+
+#draw .bord {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: -2;
+	opacity: 0.8;
+}
+
+.vp {
+	height: calc(100vh - 40px - 5em);
+	width: 100%;
+}
+
+#impeh {
+	width: calc(100% - env(safe-area-inset-left));
+	height: 100%;
+	overflow-y: scroll;
+	background-color: rgba(30, 30, 30, 0.6);
+	backdrop-filter: blur(5px);
+	padding-top: 50px;
+	z-index: 10;
+	margin-left: env(safe-area-inset-left);
+	position: fixed;
+	top: 0;
+	transition: opacity 384ms;
+	text-align: center;
+	display: none;
+	pointer-events: none;
+}
+
+#impeh img {
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	animation: bounceIn 652ms;
+}
+
+#impeh b {
+	font-size: 300%;
+	font-weight: 800;
+	text-shadow: 0 0 10px #1365FE;
+	line-height: 90vh;
+	animation: jslideout 212ms;
+	color: #FFF;
+}
+
+#draw span {
+	color: #FFF;
+}
+
+#draw b {
+	text-shadow: 0 0 5px #EEE;
+}
+
+#exc,
+#exf {
+	position: relative;
+	top: 0.5px;
+	font-weight: 600;
+}
+
+#can {
+	display: inline-block;
+	height: 100px;
+	width: calc(10% - 6px);
+	margin: 0.5px;
+	border: 1.5px solid #353;
+	border-radius: 5px;
+	float: left;
+	padding: 1px;
+	font-size: 200%;
+	line-height: 110px;
+	text-align: center;
+	background-color: #585;
+	transition: background-color 384ms;
+}
+
+#stcry {
+	height: 30px;
+	line-height: 30px;
+	background-color: #ADF;
+}
+
+#topline button {
+	border-radius: 2.5px;
+	width: 16.6666666%;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	font-size: 150%;
+	text-align: center;
+	overflow: hidden;
+	display: inline-block;
+	float: left;
+}

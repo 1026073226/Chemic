@@ -1,0 +1,299 @@
+:root {
+	--color: 0, 0, 0;
+}
+
+@keyframes protect {
+
+	0%,
+	100% {
+		display: block;
+	}
+}
+
+@keyframes cgout {
+	100% {
+		background-color: rgba(255, 255, 255, 0.6);
+	}
+}
+
+@keyframes cgin {
+	100% {
+		background-color: rgba(255, 255, 255, 0.25);
+	}
+}
+
+.game-ui {
+	position: fixed;
+	z-index: 100;
+	font-family: var(--font);
+}
+
+@keyframes entropy-pulse {
+
+	0%,
+	100% {
+		box-shadow: 0 0 10px hsla(var(--color), 0.4);
+	}
+
+	50% {
+		box-shadow: 0 0 20px hsla(var(--color), 0.8);
+	}
+}
+
+@keyframes entropy-alert {
+	0% {
+		transform: scale(1);
+	}
+
+	60% {
+		transform: scale(1.1);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
+#entropy-display {
+	top: 37px;
+	left: 60px;
+	height: 30px;
+	width: 100px;
+	line-height: 30px;
+	background: rgb(100, 100, 100);
+	backdrop-filter: blur(5px);
+	border-radius: 15px;
+	padding: 10px 15px;
+	box-shadow: 0 0 10px;
+	animation: entropy-pulse 2s infinite;
+	opacity: 0.01;
+	pointer-events: none;
+	transition: opacity 384ms;
+}
+
+.entropy-bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.entropy-icon {
+	font-size: 24px;
+	color: #ff5555;
+	text-shadow: 0 0 10px #ff0000;
+	font-family: defalut;
+}
+
+.entropy-value {
+	font-size: 20px;
+	color: #fff;
+	font-weight: bold;
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
+	transition: color 0.3s;
+}
+
+/* 游戏容器样式 */
+#game-container {
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	top: 0;
+	left: 0;
+	z-index: 0;
+	overflow: hidden;
+}
+
+/* 角色选择卡片 */
+.character-card {
+	width: 120px;
+	height: 120px;
+	margin: 15px;
+	background: rgba(255, 255, 255, 0.1);
+	border-radius: 15px;
+	overflow: hidden;
+	animation: bounceIn 386ms;
+	position: relative;
+	z-index: 100;
+	display: inline-block;
+}
+
+/* 控制按钮容器 */
+#controls {
+	position: fixed;
+	bottom: 30px;
+	width: 100%;
+	display: none;
+	justify-content: space-between;
+	padding: 0 5%;
+	box-sizing: border-box;
+	z-index: 100;
+	pointer-events: none;
+	overflow: visible;
+}
+
+/* 防止移动端点击延迟 */
+#controls * {
+    touch-action: manipulation;
+}
+
+#pause {
+	position: fixed;
+	width: 20px;
+	height: 20px;
+	overflow: visible;
+	top: 20px;
+	right: 20px;
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	pointer-events: all;
+	z-index: 1005;
+}
+
+/* 按钮组布局 */
+.move-group {
+	display: flex;
+	gap: 20px;
+}
+
+/* 控制按钮样式 */
+.ctrl-btn {
+	width: 65px;
+	height: 65px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.25);
+	border: 2px solid rgba(255, 255, 255, 0.8);
+	font-size: 28px;
+	color: white;
+	backdrop-filter: blur(8px);
+	touch-action: manipulation;
+	animation: cgin 486ms forwards;
+	box-shadow: 0px 2px 5px #EEE;
+	pointer-events: all;
+}
+
+.ctrl-btn:active {
+	animation: cgout 122ms forwards;
+}
+
+/* 跳跃按钮定位 */
+#jump {
+	position: absolute;
+	right: 100px;
+}
+
+#spell {
+	position: absolute;
+	right: 20px;
+	bottom: 50px;
+}
+
+/* 画布尺寸适配 */
+#game-container canvas {
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: contain;
+}
+
+#character-select {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100vh;
+	width: 100vw;
+	z-index: 100;
+}
+
+.character-card img {
+	width: 120px;
+	object-fit: contain;
+}
+
+#pause-menu {
+	position: fixed;
+	top: 0;
+	left: 0;
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 452ms;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba(30, 30, 30, 0.6);
+	backdrop-filter: blur(5px);
+	padding-top: 50px;
+	z-index: 101;
+	padding-left: env(safe-area-inset-left);
+}
+
+#jam-out {
+	width: 50%;
+	height: 30px;
+	background-color: #8E6;
+	transform: translateX(50%);
+	margin-bottom: 10px;
+}
+
+#quit-game {
+	background-color: #86E;
+	width: 50%;
+	height: 30px;
+	transform: translateX(50%);
+	margin-bottom: 10px;
+}
+
+#quit-app {
+	background-color: #C43;
+	width: 50%;
+	height: 30px;
+	transform: translateX(50%);
+	margin-bottom: 10px;
+}
+
+#change-controls {
+	background-color: #ED8;
+	width: 50%;
+	height: 30px;
+	transform: translateX(50%);
+	margin-bottom: 10px;
+}
+
+#current-effects {
+	height: calc(65vh - 80px);
+	width: 30px;
+	position: fixed;
+	top: 80px;
+	left: 2px;
+	z-index: 1;
+	background-color: rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(5px);
+	border-radius: 5px;
+	box-shadow: 0 0 5px #555;
+	overflow-y: scroll;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+#current-effects::-webkit-scrollbar {
+	display: none;
+}
+
+#current-effects .bar {
+	height: 25px;
+	width: 25px;
+	margin: 2.5px;
+	border: #333;
+	background-color: #888;
+	box-shadow: 0 0 3px #CCC;
+	border-radius: 5px;
+	display: inline-block;
+	float: left;
+	text-align: center;
+	line-height: 28px;
+	opacity: 0.6;
+}
+
+#menu-container {
+	width: 100%;
+	position: fixed;
+	top: 50%;
+	transform: translateY(-50%);
+}
