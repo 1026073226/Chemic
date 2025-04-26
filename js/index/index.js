@@ -606,6 +606,9 @@ var app = new Vue( {
 			if ( this.inter.z ) {
 				clearTimeout( this.inter.z );
 			}
+			if( key === "ballm" && value ) {
+			  this.balls.update();
+			}
 			let z = ( value ? -1 : 1 );
 			let a = ( value ? "slideout 206ms" : "slidein 286ms" );
 			this.playSound( "ka" );
@@ -865,7 +868,6 @@ var app = new Vue( {
 						this.brand.push( this.random( prop ) );
 					} else {
 						this.pushing = false;
-						this.balls.update();
 						clearInterval( this.inter.new );
 					}
 					i++;
@@ -1561,7 +1563,6 @@ var app = new Vue( {
 				this.force -= this.goods[ key ];
 				this.goods[ key ] = Math.floor( 1.01 * this.goods[ key ] + 1 );
 				this.brand.push( key );
-				this.balls.update();
 				this.tip( "购买了: " + key + " *1" );
 				this.playSound( "cilllllll", false );
 			} else {

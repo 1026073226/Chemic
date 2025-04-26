@@ -938,7 +938,7 @@ iframe {
 	background: none;
 	border: none;
 	text-shadow: 0 1px 5px #DDD;
-	z-index: 12;
+	z-index: 11;
 }
 
 #loadPic {

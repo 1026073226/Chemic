@@ -132,6 +132,10 @@ class BallScene extends Phaser.Scene {
 						if (this.selectedFuncBall) {
 							// 取消之前选中的功能球的发光效果
 							this.selectedFuncBall.postFX.clear();
+							if(this.selectedFuncBall === body.gameObject) {
+							  this.selectedFuncBall = null;
+							  return;
+							}
 						}
 						// 设置新的选中状态
 						this.selectedFuncBall = body.gameObject;
