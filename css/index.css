@@ -249,6 +249,7 @@ input[type="range"] {
 #ballm {
 	padding: 0;
 	margin: 0;
+	z-index: 5;
 }
 #ballm canvas {
 	position: absolute;
@@ -938,7 +939,7 @@ iframe {
 	background: none;
 	border: none;
 	text-shadow: 0 1px 5px #DDD;
-	z-index: 11;
+	z-index: 6;
 }
 
 #loadPic {

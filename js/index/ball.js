@@ -73,6 +73,10 @@ class BallScene extends Phaser.Scene {
 			if ( this.draggingBall && this.dragConstraint ) {
 				// 移除拖动约束
 				this.matter.world.removeConstraint( this.dragConstraint );
+				console.log(this.draggingBall.body.position.x, this.dividerX)
+				if( this.draggingBall.body.position.x > this.dividerX) {
+					this.useBall(this.draggingBall);
+				}
 				this.dragConstraint = null;
 				this.draggingBall = null;
 			}
@@ -186,20 +190,29 @@ class BallScene extends Phaser.Scene {
 		} );
 	}
 
+	useBall( ball ) {
+		app.add( ball.btext );
+		this.destroyBall(ball);
+	}
+
+	destroyBall(ball) {
+		if ( ball.label ) {
+			ball.label.destroy();
+			ball.label = null;
+		}
+		if ( ball.body ) {
+			this.matter.world.remove( ball.body );
+			ball.body = null;
+		}
+		if ( ball.destroy ) {
+			ball.destroy();
+		}
+	}
+
 	updateBalls() {
 		// 完全清理所有现有小球
 		this.balls.forEach( ball => {
-			if ( ball.label ) {
-				ball.label.destroy();
-				ball.label = null;
-			}
-			if ( ball.body ) {
-				this.matter.world.remove( ball.body );
-				ball.body = null;
-			}
-			if ( ball.destroy ) {
-				ball.destroy();
-			}
+			this.destroyBall(ball);
 		} );
 		this.balls = [];
 
@@ -225,7 +238,7 @@ class BallScene extends Phaser.Scene {
 		}
 	}
 
-	createBallWithText( x, y, text ) {
+	createBallWithText( x, y, text) {
 		// 根据原子序数计算半径，使用对数函数使大小差距更小
 		const atomic = chemist.elements[ text ]?.atomic || 1;
 		const radius = Math.floor( 20 + Math.log2( atomic ) * 5 ); // 基础大小20，每增加一倍原子序数增加5像素
@@ -282,6 +295,9 @@ class BallScene extends Phaser.Scene {
 
 		// 将文字绑定到物理体
 		ball.label = label;
+
+		//将索引绑定到小球
+		ball.btext = text;
 
 		// 更新位置
 		this.matter.world.on( 'afterupdate', () => {
