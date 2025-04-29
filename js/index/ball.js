@@ -9,6 +9,8 @@ class BallScene extends Phaser.Scene {
 		this.dragConstraint = null; // 拖动约束
 		this.selectedFuncBall = null; // 当前选中的功能球
 		this.glowFX = null; // 发光效果
+		this.maxBallsWidth = 0;
+		this.lastBrand = null;
 	}
 
 	preload() {
@@ -19,7 +21,6 @@ class BallScene extends Phaser.Scene {
 		window.$this = this;
 		const width = this.scale.width;
 		const height = this.scale.height;
-		this.maxBallsWidth = 0;
 
 		// 计算分隔线位置（左侧占80%）
 		this.dividerX = width * 0.8;
@@ -102,7 +103,8 @@ class BallScene extends Phaser.Scene {
 					const ballText = body.gameObject.btext;
 
 					// 如果已经选中了功能球，且点击的是其他球
-					if ( this.selectedFuncBall && this.selectedFuncBall !== body.gameObject && canFunc ) {
+					if ( this.selectedFuncBall && this.selectedFuncBall !== body.gameObject &&
+						canFunc ) {
 						// 确保目标不是功能球
 						if ( !ballText.match( /^\+\d$/ ) ) {
 							const multiplier = parseInt( this.selectedFuncBall.label.node.innerHTML
@@ -216,7 +218,28 @@ class BallScene extends Phaser.Scene {
 		}
 	}
 
+	calculateBallPosition( i, gridSize, cellWidth, cellHeight ) {
+		// 计算网格位置
+		const row = Math.floor( i / gridSize );
+		const col = i % gridSize;
+
+		// 在网格位置周围添加随机偏移，确保在左侧区域内
+		const x = ( col + 1 ) * cellWidth + Phaser.Math.Between( -cellWidth / 3, cellWidth / 3 );
+		const y = ( row + 1 ) * cellHeight + Phaser.Math.Between( -cellHeight / 3, cellHeight / 3 );
+
+		// 确保x坐标不超过分隔线
+		const finalX = Math.min( x, this.dividerX - 20 ); // 留出一些边距
+		return {
+			x: finalX,
+			y: y,
+		}
+	}
+
 	updateBalls() {
+		if ( JSON.stringify( app.brand ) === this.lastBrand ) {
+			return;
+		}
+		this.lastBrand = JSON.stringify( app.brand );
 		// 完全清理所有现有小球
 		this.balls.forEach( ball => {
 			this.destroyBall( ball );
@@ -231,18 +254,11 @@ class BallScene extends Phaser.Scene {
 
 		// 根据brand创建新的小球
 		for ( let i = 0; i < app.brand.length; i++ ) {
-			// 计算网格位置
-			const row = Math.floor( i / gridSize );
-			const col = i % gridSize;
-
-			// 在网格位置周围添加随机偏移，确保在左侧区域内
-			const x = ( col + 1 ) * cellWidth + Phaser.Math.Between( -cellWidth / 3, cellWidth / 3 );
-			const y = ( row + 1 ) * cellHeight + Phaser.Math.Between( -cellHeight / 3, cellHeight / 3 );
-
-			// 确保x坐标不超过分隔线
-			const finalX = Math.min( x, this.dividerX - 20 ); // 留出一些边距
-
-			this.createBallWithText( finalX, y, app.brand[ i ] );
+			const {
+				x,
+				y
+			} = this.calculateBallPosition( i, gridSize, cellWidth, cellHeight );
+			this.createBallWithText( x, y, app.brand[ i ] );
 
 		}
 
@@ -317,7 +333,7 @@ class BallScene extends Phaser.Scene {
 
 		//将索引绑定到小球
 		ball.btext = text;
-		
+
 		// 将实际大小绑定至小球
 		ball.realRadius = radius;
 

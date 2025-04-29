@@ -209,7 +209,7 @@ var app = new Vue( {
 
 		quests: [],
 
-		version: "15.2_beta",
+		version: "17.3_beta",
 
 		cannext: true,
 
@@ -606,8 +606,8 @@ var app = new Vue( {
 			if ( this.inter.z ) {
 				clearTimeout( this.inter.z );
 			}
-			if( key === "ballm" && value ) {
-			  this.balls.update();
+			if ( key === "ballm" && value ) {
+				this.balls.update();
 			}
 			let z = ( value ? -1 : 1 );
 			let a = ( value ? "slideout 206ms" : "slidein 286ms" );
@@ -702,15 +702,14 @@ var app = new Vue( {
 			}.bind( this ), 286 );
 		},
 		splitCamelCase( str ) {
-			const result = str.match( /[A-Z][a-z]/g );
+			const result = str.match( /[A-Z][a-z]?/g );
 			return result || [];
 		},
-		add( v, i = -1, bd = false) {
+		add( v, i = -1, bd = false ) {
 			this.playSound( "da" );
 			if ( i == -1 ) {
 				i = this.brand.indexOf( v );
-			}
-			else if( !v && i > -1 ) {
+			} else if ( !v && i > -1 ) {
 				v = this.brand[ i ];
 			}
 			if ( v in this.chemist.elements ) {
@@ -728,7 +727,7 @@ var app = new Vue( {
 				for ( let i = 0; i < v; i++ ) {
 					let eles = this.splitCamelCase( lastone.replaceAll( /\(|\)/g, "" ) );
 					for ( let j = 0; j < eles.length; j++ ) {
-						this.val.push( this.chemist.elements[ eles[ i ] ].valence );
+						this.val.push( this.chemist.elements[ eles[ j ] ].valence );
 					}
 				}
 			}
@@ -1577,7 +1576,7 @@ var app = new Vue( {
 			// 将消息添加到队列
 			this.tipQueue.push( msg );
 			// 如果当前没有正在显示的提示，则显示下一个提示
-			if ( !this.isTipShowing || !rep ) {
+			if ( !this.isTipShowing || rep ) {
 				this.showNextTip();
 			}
 		},
@@ -1593,8 +1592,10 @@ var app = new Vue( {
 			t.style.opacity = 0.8;
 			this.inter.tip = setTimeout( () => {
 				t.style.opacity = 0;
-				this.isTipShowing = false; // 提示完成后，设置为未显示状态
-				this.showNextTip(); // 显示下一个提示
+				setTimeout( () => {
+					this.isTipShowing = false; // 提示完成后，设置为未显示状态
+					this.showNextTip(); // 显示下一个提示
+				}, 400 );
 			}, 2198 );
 		},
 		confirm( msg, f = function() {}, ym = "确认", nm = "取消" ) {
@@ -2067,7 +2068,7 @@ var app = new Vue( {
 		},
 		stcry() {
 			const n = Math.round( ( this.h1 + this.h2 ) / 320 + this.randint( 0, ( this.h1 + this.h2 ) /
-			640 ) );
+				640 ) );
 			this.crystal += n;
 			this.tip( "凝聚晶体 " + n );
 			this.h1 = 0;
