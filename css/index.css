@@ -1104,3 +1104,7 @@ iframe {
 	display: inline-block;
 	float: left;
 }
+
+.ball-label {
+	pointer-events: none !important;
+}

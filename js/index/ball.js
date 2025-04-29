@@ -97,7 +97,6 @@ class BallScene extends Phaser.Scene {
 				const dy = body.position.y - clickY;
 				const distance = Math.sqrt( dx * dx + dy * dy );
 				const radius = body.gameObject.realRadius || body.gameObject.radius || 20;
-
 				// 如果直接点击到小球
 				if ( distance <= radius ) {
 					const ballText = body.gameObject.btext;
@@ -178,8 +177,8 @@ class BallScene extends Phaser.Scene {
 							y: clickY
 						},
 						body: body,
-						stiffness: 0.1,
-						damping: 0.01
+						stiffness: 0.015,
+						damping: 0.005 * this.draggingBall.radius,
 					} );
 				}
 				// 如果在小球周围，则施加推动力
@@ -200,8 +199,7 @@ class BallScene extends Phaser.Scene {
 	}
 
 	useBall( ball ) {
-		app.add( ball.btext );
-		this.destroyBall( ball );
+		if ( app.add( ball.btext ) ) this.destroyBall( ball );
 	}
 
 	destroyBall( ball ) {
@@ -275,7 +273,7 @@ class BallScene extends Phaser.Scene {
 
 	createBallWithText( x, y, text ) {
 		// 根据原子序数计算半径，使用对数函数使大小差距更小
-		const atomic = chemist.elements[ text ]?.atomic || 1;
+		const atomic = chemist.elements[ text ]?.atomic || 0.1 / prop[ text ] || 1;
 		const radius = Math.floor( 20 + Math.log2( atomic ) * 5 ); // 基础大小20，每增加一倍原子序数增加5像素
 		let color = colors[ text ] || "#DDDDDD";
 		color = Phaser.Display.Color.HexStringToColor( color ).color;
@@ -315,7 +313,6 @@ class BallScene extends Phaser.Scene {
 		const label = this.add.dom( x, y, 'div', {
 			'font-size': Math.min( radius, 30 ) + 'px',
 			'color': '#555555',
-			'pointer-events': 'none',
 			'line-height': '1',
 			'vertical-align': 'middle',
 			'width': radius + 'px',
@@ -323,10 +320,12 @@ class BallScene extends Phaser.Scene {
 			'box-sizing': 'border-box',
 		}, text );
 		label.setDepth( 2 )
-			.setOrigin( 0 );
+			.setOrigin( 0 )
+			.disableInteractive();
 
 		// 确保sub标签能被正确解析
 		label.node.innerHTML = text.replace( /<sub>/g, '<sub style="font-size: 0.7em; vertical-align: sub;">' );
+		label.node.className = 'ball-label';
 
 		// 将文字绑定到物理体
 		ball.label = label;
@@ -340,7 +339,7 @@ class BallScene extends Phaser.Scene {
 		// 更新位置
 		this.matter.world.on( 'afterupdate', () => {
 			if ( label && label.active ) {
-				label.x = ball.x;
+				label.x = ball.x - ball.realRadius / 3;
 				label.y = ball.y;
 			}
 		} );
@@ -385,6 +384,10 @@ const config = {
 				y: 0.01
 			}
 		}
+	},
+	input: {
+		touch: true,
+		mouse: true
 	},
 	scene: BallScene
 };

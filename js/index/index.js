@@ -721,7 +721,7 @@ var app = new Vue( {
 				let lastone = keys[ keys.length - 1 ];
 				if ( lastone == undefined ) {
 					this.tip( "数字不能在首位" );
-					return;
+					return false;
 				}
 				this.text[ lastone ] += v;
 				for ( let i = 0; i < v; i++ ) {
@@ -739,9 +739,9 @@ var app = new Vue( {
 					once: true
 				} );
 			} else {
-				this.brand.splice( i, 1 );
-				return;
+				return this.brand.splice( i, 1 );
 			}
+			return true;
 		},
 		addInObj( obj, v ) {
 			if ( v in obj ) {
@@ -1572,9 +1572,23 @@ var app = new Vue( {
 				this.playSound( "duong", false );
 			}
 		},
+		checkQueue( array, targetString ) {
+			// 检查数组长度是否至少为3
+			if ( array.length < 3 ) {
+				return false;
+			}
+
+			// 获取数组末尾的三个元素
+			const lastThreeElements = array.slice( -3 );
+
+			// 检查这三个元素是否都等于目标字符串
+			return lastThreeElements.every( element => element === targetString );
+		},
 		tip( msg, rep ) {
-			// 将消息添加到队列
-			this.tipQueue.push( msg );
+			if ( !this.checkQueue( this.tipQueue, msg ) ) {
+				// 将消息添加到队列
+				this.tipQueue.push( msg );
+			}
 			// 如果当前没有正在显示的提示，则显示下一个提示
 			if ( !this.isTipShowing || rep ) {
 				this.showNextTip();
