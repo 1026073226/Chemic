@@ -226,18 +226,23 @@ const chemist = {
 			valence: [NaN]
 		},
 		"OH": {
+			atomic: 9,
 			valence: [-1],
 		},
 		"CO<sub>3</sub>": {
+			atomic: 30,
 			valence: [-2],
 		},
 		"SO<sub>4</sub>": {
+			atomic: 48,
 			valence: [-2],
 		},
 		"NO<sub>3</sub>": {
+			atomic: 31,
 			valence: [-1],
 		},
 		"NH<sub>4</sub>": {
+			atomic: 11,
 			valence: [1],
 		},
 	},

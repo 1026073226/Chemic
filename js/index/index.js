@@ -209,7 +209,7 @@ var app = new Vue( {
 
 		quests: [],
 
-		version: "15.2_beta",
+		version: "17.3_beta",
 
 		cannext: true,
 
@@ -606,8 +606,8 @@ var app = new Vue( {
 			if ( this.inter.z ) {
 				clearTimeout( this.inter.z );
 			}
-			if( key === "ballm" && value ) {
-			  this.balls.update();
+			if ( key === "ballm" && value ) {
+				this.balls.update();
 			}
 			let z = ( value ? -1 : 1 );
 			let a = ( value ? "slideout 206ms" : "slidein 286ms" );
@@ -702,13 +702,15 @@ var app = new Vue( {
 			}.bind( this ), 286 );
 		},
 		splitCamelCase( str ) {
-			const result = str.match( /[A-Z][a-z]/g );
+			const result = str.match( /[A-Z][a-z]?/g );
 			return result || [];
 		},
-		add( v, i, bd ) {
+		add( v, i = -1, bd = false ) {
 			this.playSound( "da" );
 			if ( i == -1 ) {
 				i = this.brand.indexOf( v );
+			} else if ( !v && i > -1 ) {
+				v = this.brand[ i ];
 			}
 			if ( v in this.chemist.elements ) {
 				this.addInObj( ( this.alting ? this.alts : this.text ), v );
@@ -719,27 +721,27 @@ var app = new Vue( {
 				let lastone = keys[ keys.length - 1 ];
 				if ( lastone == undefined ) {
 					this.tip( "数字不能在首位" );
-					return;
+					return false;
 				}
 				this.text[ lastone ] += v;
 				for ( let i = 0; i < v; i++ ) {
 					let eles = this.splitCamelCase( lastone.replaceAll( /\(|\)/g, "" ) );
 					for ( let j = 0; j < eles.length; j++ ) {
-						this.val.push( this.chemist.elements[ eles[ i ] ].valence );
+						this.val.push( this.chemist.elements[ eles[ j ] ].valence );
 					}
 				}
 			}
-			if ( !this.settings.ap || bd.target.children[ 0 ].innerText == "" ) {
+			if ( bd && ( !this.settings.ap || bd.target.children[ 0 ].innerText == "" ) ) {
 				this.a.play( bd.target, "jslidein 236ms ease-in", 0 );
+				bd.target.addEventListener( "animationend", function() {
+					this.brand.splice( i, 1 );
+				}.bind( this ), {
+					once: true
+				} );
 			} else {
-				this.brand.splice( i, 1 );
-				return;
+				return this.brand.splice( i, 1 );
 			}
-			bd.target.addEventListener( "animationend", function() {
-				this.brand.splice( i, 1 );
-			}.bind( this ), {
-				once: true
-			} );
+			return true;
 		},
 		addInObj( obj, v ) {
 			if ( v in obj ) {
@@ -1570,11 +1572,25 @@ var app = new Vue( {
 				this.playSound( "duong", false );
 			}
 		},
+		checkQueue( array, targetString ) {
+			// 检查数组长度是否至少为3
+			if ( array.length < 3 ) {
+				return false;
+			}
+
+			// 获取数组末尾的三个元素
+			const lastThreeElements = array.slice( -3 );
+
+			// 检查这三个元素是否都等于目标字符串
+			return lastThreeElements.every( element => element === targetString );
+		},
 		tip( msg, rep ) {
-			// 将消息添加到队列
-			this.tipQueue.push( msg );
+			if ( !this.checkQueue( this.tipQueue, msg ) ) {
+				// 将消息添加到队列
+				this.tipQueue.push( msg );
+			}
 			// 如果当前没有正在显示的提示，则显示下一个提示
-			if ( !this.isTipShowing || !rep ) {
+			if ( !this.isTipShowing || rep ) {
 				this.showNextTip();
 			}
 		},
@@ -1590,8 +1606,10 @@ var app = new Vue( {
 			t.style.opacity = 0.8;
 			this.inter.tip = setTimeout( () => {
 				t.style.opacity = 0;
-				this.isTipShowing = false; // 提示完成后，设置为未显示状态
-				this.showNextTip(); // 显示下一个提示
+				setTimeout( () => {
+					this.isTipShowing = false; // 提示完成后，设置为未显示状态
+					this.showNextTip(); // 显示下一个提示
+				}, 400 );
 			}, 2198 );
 		},
 		confirm( msg, f = function() {}, ym = "确认", nm = "取消" ) {
@@ -1964,8 +1982,23 @@ var app = new Vue( {
 		altDraw() {
 			this.impeQue = [];
 			this.drawQue = [];
+			if( this.crystal < 10 ) {
+				this.confirm( "晶体不足，是否使用300元素力购买?", ( t ) => {
+					if ( t ) {
+						if ( this.force >= 300 ) {
+							this.force -= 300;
+							this.crystal += 10;
+							this.tip( "购买了: 晶体*10" );
+						} else {
+							this.tip( "元素力不足" );
+							this.playSound( "duong", false );
+						}
+					}
+					return false;
+				} );
+			}
 			for ( let i = 0; i < 10; i++ ) {
-				if ( !this.doDraw( () => {
+				this.doDraw( () => {
 						this.confirm( "晶体不足，是否使用300元素力购买?", ( t ) => {
 							if ( t ) {
 								if ( this.force >= 300 ) {
@@ -1979,9 +2012,7 @@ var app = new Vue( {
 							}
 							return false;
 						} );
-					}, i ) ) {
-					return;
-				}
+					}, i );
 			}
 		},
 		oneDraw() {
@@ -2064,7 +2095,7 @@ var app = new Vue( {
 		},
 		stcry() {
 			const n = Math.round( ( this.h1 + this.h2 ) / 320 + this.randint( 0, ( this.h1 + this.h2 ) /
-			640 ) );
+				640 ) );
 			this.crystal += n;
 			this.tip( "凝聚晶体 " + n );
 			this.h1 = 0;

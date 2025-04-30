@@ -1506,7 +1506,7 @@ const config = {
 	parent: 'game-container',
 	fps: {
 		target: 60,
-		min: 45
+		min: 30
 	},
 	renderer: {
 		defaultFilterMode: Phaser.Textures.FilterMode.NEAREST
