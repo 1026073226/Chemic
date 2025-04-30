@@ -1994,8 +1994,8 @@ var app = new Vue( {
 							this.playSound( "duong", false );
 						}
 					}
-					return false;
 				} );
+				return false;
 			}
 			for ( let i = 0; i < 10; i++ ) {
 				this.doDraw( () => {
