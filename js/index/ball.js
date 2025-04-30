@@ -368,6 +368,10 @@ const config = {
 		width: '100%',
 		height: '100%'
 	},
+	fps: {
+		target: 60,
+		min: 30
+	},
 	dom: {
 		createContainer: true,
 	},

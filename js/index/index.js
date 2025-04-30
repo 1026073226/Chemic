@@ -1982,8 +1982,23 @@ var app = new Vue( {
 		altDraw() {
 			this.impeQue = [];
 			this.drawQue = [];
+			if( this.crystal < 10 ) {
+				this.confirm( "晶体不足，是否使用300元素力购买?", ( t ) => {
+					if ( t ) {
+						if ( this.force >= 300 ) {
+							this.force -= 300;
+							this.crystal += 10;
+							this.tip( "购买了: 晶体*10" );
+						} else {
+							this.tip( "元素力不足" );
+							this.playSound( "duong", false );
+						}
+					}
+					return false;
+				} );
+			}
 			for ( let i = 0; i < 10; i++ ) {
-				if ( !this.doDraw( () => {
+				this.doDraw( () => {
 						this.confirm( "晶体不足，是否使用300元素力购买?", ( t ) => {
 							if ( t ) {
 								if ( this.force >= 300 ) {
@@ -1997,9 +2012,7 @@ var app = new Vue( {
 							}
 							return false;
 						} );
-					}, i ) ) {
-					return;
-				}
+					}, i );
 			}
 		},
 		oneDraw() {
