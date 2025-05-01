@@ -97,9 +97,9 @@ class PreloadScene extends Phaser.Scene {
 
 		// 加载环境资源
 		this.load.image('ground',
-			'img/floor.png');
+			'img/tloor.png');
 		this.load.image('background',
-			'img/tbc.png');
+			'img/fbc.png');
 		this.load.image('enemy',
 			'img/act/F/c.png');
 		// 加载装饰物资源
@@ -320,7 +320,17 @@ class MainGameScene extends Phaser.Scene {
 			`char-${this.selectedChar}`
 		).setOrigin(0.5,
 			0.5).setScale(0.2)
-
+    let fx = this.player.postFX.addGlow( this.SPELL_COLOR, 1, 0, false, 0.01, 20 );
+    // 添加呼吸效果
+		this.tweens.add( {
+			targets: fx,
+			outerStrength: 3,
+			innerStrength: 1,
+			yoyo: true,
+			repeat: -1,
+			duration: 1000,
+			ease: 'Sine.easeInOut'
+		} );
 		// 物理设置
 		this.player.setCollideWorldBounds(false);
 		this.physics.add.collider(this.player,
@@ -429,27 +439,13 @@ class MainGameScene extends Phaser.Scene {
 			
 			// 修改Bloom参数
 			this.bloomEffect = fx.addBloom(
-				0xFFD700,  // 基础颜色（改为金色高光）
-				1.5,       // 强度
-				1.2,       // 模糊半径
-				4,         // 模糊步数
-				0.7,       // 质量
-				{
-					intensity: 0.8,   // 光晕强度
-					glow: 0.4,        // 辉光扩散
-					quality: 0.9,     // 采样质量
-					distance: 1.5     // 光晕距离
-				}
+				0xF9E0A0,  // 基础颜色（改为金色高光）
+				0,       // 水平偏移
+				1,       // 垂直偏移
+				2,         // 模糊强度
+				0.15,       // 强度
+				2
 			);
-			
-			// 添加颜色矩阵调整色调
-			fx.addColorMatrix({
-				hue: 0,        // 色相调整
-				sat: 0.3,      // 饱和度
-				lum: 0.1       // 亮度
-			});
-
-			this.bloomEffect.strength = 0.5;
 	}
 
 	setupPowerups() {
@@ -791,7 +787,6 @@ class MainGameScene extends Phaser.Scene {
 	}
 
 	handlePC(key, active) {
-		console.log(`key: ${key} is ${active}`);
 		if (this.controlsWay == "touch") {
 			this.changeControls();
 		};
