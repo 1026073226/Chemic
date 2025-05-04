@@ -596,14 +596,20 @@ class MainGameScene extends Phaser.Scene {
 		// 敌人AI行为
 		enemy.isGrounded = "borning";
 		enemy.update = () => {
-		  
+		  if (!enemy.body) {
+		    this.events.off("update", enemy.update);
+		    return;
+		  }
+		  if (enemy.y > this.scale.height * 2) {
+        enemy.destroy();
+      }
 		  //检查可见性
-			if(Math.abs(enemy.x - this.player.x) >= 0.5 * this.scale.width) {
+			if(Math.abs(enemy.x - this.player.x) >= this.scale.width) {
 			    enemy.active = false;
-			    if(Math.abs(enemy.x - this.player.x) >= this.scale.width * 1.5) {
+			    if(Math.abs(enemy.x - this.player.x) >= this.scale.width * 2) {
 			      enemy.destroy();
 			    }
-			 } else {
+			 } else if(!enemy.active) {
 			   enemy.active = true;
 			 }
 			if(!enemy.active) {
@@ -629,7 +635,7 @@ class MainGameScene extends Phaser.Scene {
 				// 踏空后转向
 				enemy.isGrounded = false;
 				this.turnEnemy(enemy);
-				enemy.setVelocityY(10);
+				enemy.setVelocityY(15);
 				return;
 			} else if (enemy.body.blocked.down) {
 				enemy.isGrounded = true;
@@ -670,10 +676,7 @@ class MainGameScene extends Phaser.Scene {
 		this.physics.add.overlap(this.player, enemy, this.handleEnemyCollision, null, this);
 		enemy.setGravityY(800);
 		// 在敌人生成后绑定到场景更新
-		this.events.on('update',
-			() => {
-				if (enemy.active) enemy.update();
-			});
+		this.events.on('update', enemy.update);
 		this.enemies.add(enemy);
 	}
 
