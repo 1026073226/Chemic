@@ -378,6 +378,15 @@ class MainGameScene extends Phaser.Scene {
 			stroke: "#FCFCFC",
 			strokeThickness: 2,
 		}).setScrollFactor(0).setDepth(100);
+		
+		//初始化调试信息
+		this.debugText = this.add.text(0, 50, "", {
+			fontSize: "20px",
+			fill: "#333333",
+			stroke: "#FCFCFC",
+			strokeThickness: 2,
+		}).setScrollFactor(0).setDepth(100);
+		
 		//初始化摇杆
 		this.setupJoystick();
 		// 初始化敌人伤害计数器
@@ -587,6 +596,19 @@ class MainGameScene extends Phaser.Scene {
 		// 敌人AI行为
 		enemy.isGrounded = "borning";
 		enemy.update = () => {
+		  
+		  //检查可见性
+			if(Math.abs(enemy.x - this.player.x) >= 0.5 * this.scale.width) {
+			    enemy.active = false;
+			    if(Math.abs(enemy.x - this.player.x) >= this.scale.width * 1.5) {
+			      enemy.destroy();
+			    }
+			 } else {
+			   enemy.active = true;
+			 }
+			if(!enemy.active) {
+			  return;
+			}
 			//检测生命
 			if (enemy.getData("hitCount") >= enemy.getData("hp")) {
 				enemy.setVelocityX(0);
@@ -1066,7 +1088,6 @@ class MainGameScene extends Phaser.Scene {
 	}
 
 	update(time, delta) {
-
 		// 背景滚动
 		this.bgLayer.tilePositionX = this.cameras.main.scrollX * 0.1;
 
