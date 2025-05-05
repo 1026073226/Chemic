@@ -708,6 +708,7 @@ class MainGameScene extends Phaser.Scene {
 						decoTypes[ Phaser.Math.RND.between( 0, decoTypes.length - 1 ) ]
 					)
 					.setScale( Phaser.Math.Between( 0.5, 1 ) );
+				deco.preFX.addGlow(0xF9E0A0, 0.5, 0.2, false, 0.05 * QUALITY);
 
 				// 添加物理碰撞
 				deco.body.setSize( deco.width * 0.8, deco.height * 0.8, true );
