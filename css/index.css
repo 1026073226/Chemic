@@ -756,10 +756,13 @@ input:hover,
 	position: relative;
 	border-radius: 5px;
 	cursor: ns-resize;
+	touch-action: none;
+	-webkit-user-select: none;
+	user-select: none;
 	transition: background-color 0.2s;
 }
 
-#troll:hover {
+#troll:hover, #troll:active {
 	background-color: rgba(255, 255, 255, 0.2);
 	opacity: 0.8;
 }

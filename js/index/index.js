@@ -2144,28 +2144,72 @@ var app = new Vue( {
 		initTrollDrag() {
 			const troll = this.d.$("#troll");
 			const bottomline = this.d.$("#bottomline");
+			let startY, startHeight;
+			let dragTimeout;
 			
-			troll.addEventListener("mousedown", (e) => {
-				this.isDragging = true;
-				this.startY = e.clientY;
-				this.startHeight = bottomline.offsetHeight;
-				document.body.style.userSelect = "none";
-			});
-			
-			document.addEventListener("mousemove", (e) => {
+			const onMove = (clientY) => {
 				if (!this.isDragging) return;
-				thi
-				const deltaY = e.clientY -  s.startY;
-				const newHeight = Math.max(50, Math.min(400, this.startHeight - deltaY));
+				const deltaY = startY - clientY;
+				const newHeight = Math.max(50, Math.min(400, startHeight + deltaY));
 				bottomline.style.height = newHeight + "px";
-				
-				// 更新 bodyline 的高度
 				this.d.$("#bodyline").style.height = `calc(100vh - ${newHeight + 160}px)`;
-			});
+			};
 			
-			document.addEventListener("mouseup", () => {
+			const onEnd = () => {
+				if (!this.isDragging) return;
 				this.isDragging = false;
 				document.body.style.userSelect = "";
+				document.removeEventListener("mousemove", onMouseMove);
+				document.removeEventListener("mouseup", onEnd);
+				document.removeEventListener("touchmove", onTouchMove);
+				document.removeEventListener("touchend", onEnd);
+				document.removeEventListener("touchcancel", onEnd);
+			};
+			
+			const onMouseMove = (e) => onMove(e.clientY);
+			const onTouchMove = (e) => {
+				if (e.cancelable) e.preventDefault();
+				onMove(e.touches[0].clientY);
+			};
+			
+			const onStart = (clientY) => {
+				this.isDragging = true;
+				startY = clientY;
+				startHeight = bottomline.offsetHeight;
+				document.body.style.userSelect = "none";
+				
+				document.addEventListener("mousemove", onMouseMove, { passive: false });
+				document.addEventListener("mouseup", onEnd);
+				document.addEventListener("touchmove", onTouchMove, { passive: false });
+				document.addEventListener("touchend", onEnd);
+				document.addEventListener("touchcancel", onEnd);
+				
+				// 清除任何现有的点击超时
+				if (dragTimeout) {
+					clearTimeout(dragTimeout);
+					dragTimeout = null;
+				}
+			};
+			
+			troll.addEventListener("mousedown", (e) => {
+				onStart(e.clientY);
+			});
+			
+			troll.addEventListener("touchstart", (e) => {
+				if (e.cancelable) e.preventDefault();
+				// 设置一个延时，如果在短时间内移动了，就不触发点击
+				dragTimeout = setTimeout(() => {
+					if (!this.isDragging) {
+						this.hidb();
+					}
+				}, 200);
+				onStart(e.touches[0].clientY);
+			});
+			
+			// 双击时触发隐藏/显示
+			troll.addEventListener("dblclick", (e) => {
+				e.preventDefault();
+				this.hidb();
 			});
 		},
 	},
