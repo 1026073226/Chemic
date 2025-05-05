@@ -371,7 +371,20 @@ class MainGameScene extends Phaser.Scene {
 			fill: "#333333",
 			stroke: "#FCFCFC",
 			strokeThickness: 2,
+<<<<<<< HEAD
 		} ).setScrollFactor( 0 ).setDepth( 100 );
+=======
+		}).setScrollFactor(0).setDepth(100);
+		
+		//初始化调试信息
+		this.debugText = this.add.text(0, 50, "", {
+			fontSize: "20px",
+			fill: "#333333",
+			stroke: "#FCFCFC",
+			strokeThickness: 2,
+		}).setScrollFactor(0).setDepth(100);
+		
+>>>>>>> edd17e7ab984d4f05dda47a0a7be2de4efc7deae
 		//初始化摇杆
 		this.setupJoystick();
 		// 初始化敌人伤害计数器
@@ -592,6 +605,25 @@ class MainGameScene extends Phaser.Scene {
 		// 敌人AI行为
 		enemy.isGrounded = "borning";
 		enemy.update = () => {
+		  if (!enemy.body) {
+		    this.events.off("update", enemy.update);
+		    return;
+		  }
+		  if (enemy.y > this.scale.height * 2) {
+        enemy.destroy();
+      }
+		  //检查可见性
+			if(Math.abs(enemy.x - this.player.x) >= this.scale.width) {
+			    enemy.active = false;
+			    if(Math.abs(enemy.x - this.player.x) >= this.scale.width * 2) {
+			      enemy.destroy();
+			    }
+			 } else if(!enemy.active) {
+			   enemy.active = true;
+			 }
+			if(!enemy.active) {
+			  return;
+			}
 			//检测生命
 			if ( enemy.getData( "hitCount" ) >= enemy.getData( "hp" ) ) {
 				enemy.setVelocityX( 0 );
@@ -611,8 +643,13 @@ class MainGameScene extends Phaser.Scene {
 			if ( enemy.isGrounded === true && !enemy.body.blocked.down ) {
 				// 踏空后转向
 				enemy.isGrounded = false;
+<<<<<<< HEAD
 				this.turnEnemy( enemy );
 				enemy.setVelocityY( 10 );
+=======
+				this.turnEnemy(enemy);
+				enemy.setVelocityY(15);
+>>>>>>> edd17e7ab984d4f05dda47a0a7be2de4efc7deae
 				return;
 			} else if ( enemy.body.blocked.down ) {
 				enemy.isGrounded = true;
@@ -653,11 +690,16 @@ class MainGameScene extends Phaser.Scene {
 		this.physics.add.overlap( this.player, enemy, this.handleEnemyCollision, null, this );
 		enemy.setGravityY( 800 );
 		// 在敌人生成后绑定到场景更新
+<<<<<<< HEAD
 		this.events.on( 'update',
 			() => {
 				if ( enemy.active ) enemy.update();
 			} );
 		this.enemies.add( enemy );
+=======
+		this.events.on('update', enemy.update);
+		this.enemies.add(enemy);
+>>>>>>> edd17e7ab984d4f05dda47a0a7be2de4efc7deae
 	}
 
 	// 装饰物生成方法
@@ -1072,11 +1114,15 @@ class MainGameScene extends Phaser.Scene {
 		}
 	}
 
+<<<<<<< HEAD
 	update( time, delta ) {
 		if ( this.sumFPS == 0 ) {
 			this.startTime = time;
 		}
 		this.sumFPS++;
+=======
+	update(time, delta) {
+>>>>>>> edd17e7ab984d4f05dda47a0a7be2de4efc7deae
 		// 背景滚动
 		if ( ( this.sumFPS ) % ( QUALITY == 1 ? 0 : QUALITY * 50 ) === 0 ) {
 			return;
