@@ -31,6 +31,7 @@ var app = new Vue( {
 		fLoader: true,
 
 		openBottomline: true,
+		bottomlineHeight: 120,
 
 		bgmNum: 4,
 
@@ -2151,7 +2152,7 @@ var app = new Vue( {
 				if (!this.isDragging) return;
 				const deltaY = startY - clientY;
 				const newHeight = Math.max(50, Math.min(400, startHeight + deltaY));
-				bottomline.style.height = newHeight + "px";
+				this.bottomlineHeight = newHeight;
 				this.d.$("#bodyline").style.height = `calc(100vh - ${newHeight + 160}px)`;
 			};
 			
@@ -2168,7 +2169,6 @@ var app = new Vue( {
 			
 			const onMouseMove = (e) => onMove(e.clientY);
 			const onTouchMove = (e) => {
-				if (e.cancelable) e.preventDefault();
 				onMove(e.touches[0].clientY);
 			};
 			
@@ -2183,12 +2183,6 @@ var app = new Vue( {
 				document.addEventListener("touchmove", onTouchMove, { passive: false });
 				document.addEventListener("touchend", onEnd);
 				document.addEventListener("touchcancel", onEnd);
-				
-				// 清除任何现有的点击超时
-				if (dragTimeout) {
-					clearTimeout(dragTimeout);
-					dragTimeout = null;
-				}
 			};
 			
 			troll.addEventListener("mousedown", (e) => {
@@ -2196,20 +2190,7 @@ var app = new Vue( {
 			});
 			
 			troll.addEventListener("touchstart", (e) => {
-				if (e.cancelable) e.preventDefault();
-				// 设置一个延时，如果在短时间内移动了，就不触发点击
-				dragTimeout = setTimeout(() => {
-					if (!this.isDragging) {
-						this.hidb();
-					}
-				}, 200);
 				onStart(e.touches[0].clientY);
-			});
-			
-			// 双击时触发隐藏/显示
-			troll.addEventListener("dblclick", (e) => {
-				e.preventDefault();
-				this.hidb();
 			});
 		},
 	},
