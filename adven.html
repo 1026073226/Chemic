@@ -19,6 +19,11 @@
 		<button id="pause">⏸️</button>
 		<div id="pause-menu">
 			<div id="menu-container">
+				<p style="padding-left: 10vw; color: #FFF;">画面质量</p>
+				<input style="padding-left: 5vw;" type="range" min="0.1" max="1" step="0.01" id="qrange"
+					oninput="QUALITY = Number(this.value); document.getElementById('quality').innerText = QUALITY" />
+				<span id="quality" class="a">1</span>
+				<br />
 				<button class="btn" id="jam-out">脱离卡死</button>
 				<button class="btn" id="quit-game">终止实验</button>
 				<button class="btn" id="change-controls">切换控制器</button>
