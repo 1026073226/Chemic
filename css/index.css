@@ -755,6 +755,13 @@ input:hover,
 	z-index: 9;
 	position: relative;
 	border-radius: 5px;
+	cursor: ns-resize;
+	transition: background-color 0.2s;
+}
+
+#troll:hover {
+	background-color: rgba(255, 255, 255, 0.2);
+	opacity: 0.8;
 }
 
 #showEle {

@@ -239,6 +239,10 @@ var app = new Vue( {
 		tipQueue: [],
 		isTipShowing: false,
 
+		isDragging: false,
+		startY: 0,
+		startHeight: 120,
+
 	},
 
 	created() {
@@ -260,6 +264,7 @@ var app = new Vue( {
 
 	mounted() {
 		this.init();
+		this.initTrollDrag();
 	},
 
 	computed: {
@@ -2135,6 +2140,33 @@ var app = new Vue( {
 					</span>
 					` );
 				} );
+		},
+		initTrollDrag() {
+			const troll = this.d.$("#troll");
+			const bottomline = this.d.$("#bottomline");
+			
+			troll.addEventListener("mousedown", (e) => {
+				this.isDragging = true;
+				this.startY = e.clientY;
+				this.startHeight = bottomline.offsetHeight;
+				document.body.style.userSelect = "none";
+			});
+			
+			document.addEventListener("mousemove", (e) => {
+				if (!this.isDragging) return;
+				thi
+				const deltaY = e.clientY -  s.startY;
+				const newHeight = Math.max(50, Math.min(400, this.startHeight - deltaY));
+				bottomline.style.height = newHeight + "px";
+				
+				// 更新 bodyline 的高度
+				this.d.$("#bodyline").style.height = `calc(100vh - ${newHeight + 160}px)`;
+			});
+			
+			document.addEventListener("mouseup", () => {
+				this.isDragging = false;
+				document.body.style.userSelect = "";
+			});
 		},
 	},
 

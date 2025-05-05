@@ -1,513 +1,510 @@
 <!DOCTYPE html>
 <html lang="zh">
-
-<head>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="css/index.css" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-	<link rel="prefetch" href="readme.html" />
-	<link rel="prerender" href="adven.html" />
-	<link rel="stylesheet" href="css/animate.css" />
-	<title>Chemic</title>
-</head>
-
-<body>
-	<img src="img/fabric.jpg" id="background" />
-	<div id="app">
-		<button id="present" @click="getPresent" :disabled="!present.require"
-			:style="'filter: grayscale(' + (present.require ? 0 : 1) + ');'">🎁<span
-				v-html="present.require"></span></button>
-		<button id="ball" @click="change('ballm', !ballm)">🧿</button>
-		<div id="rounds">回合: {{msg.p1e}}/{{msg.p2e}}&nbsp;
-			{{ (settings.sht ? (msg.ht1 + "/" + msg.ht2) : "") }}&nbsp;
-			{{ (settings.sf ? (force + "/" + fcost) : "") }}&nbsp;
-			{{ settings.senv ? env.now.icon : "" }}&nbsp;
-			<br />
-			任务: <span v-html="quests.length > 0 ? quests[0].f : '无'"></span>
-			&nbsp;
-			{{(quests.length !== 0) ? (quests[0].t + "元素力") : ""}}
-		</div>
-		<div id="topline">
-			<button @click="change('handbook', !handbook)">🔍</button>
-			<button @click="change('reaction', !reaction)">🧫</button>
-			<button @click="change('fty', !fty)">💥</button>
-			<button @click="change('h', !h)">📖</button>
-			<button @click="change('shop', !shop)">💰</button>
-			<button @click="change('draw', !draw)" v-show="connectType !== 1">🌠</button>
-		</div>
-		<div id="ballm" v-show="ballm"></div>
-		<div id="draw" v-show="draw">
-			<div
-				style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
-				<span>元素力: <b>{{force}}</b> / 30
-					<b id="exf" @click="exforce" v-show="connectType !== 1">⊕</b>
-				</span>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="css/index.css" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+		<link rel="prefetch" href="readme.html" />
+		<link rel="prerender" href="adven.html" />
+		<link rel="stylesheet" href="css/animate.css" />
+		<title>Chemic</title>
+	</head>
+	<body>
+		<img src="img/fabric.jpg" id="background" />
+		<div id="app">
+			<button id="present" @click="getPresent" :disabled="!present.require"
+				:style="'filter: grayscale(' + (present.require ? 0 : 1) + ');'">🎁<span
+					v-html="present.require"></span></button>
+			<button id="ball" @click="change('ballm', !ballm)">🧿</button>
+			<div id="rounds">回合: {{msg.p1e}}/{{msg.p2e}}&nbsp;
+				{{ (settings.sht ? (msg.ht1 + "/" + msg.ht2) : "") }}&nbsp;
+				{{ (settings.sf ? (force + "/" + fcost) : "") }}&nbsp;
+				{{ settings.senv ? env.now.icon : "" }}&nbsp;
+				<br />
+				任务: <span v-html="quests.length > 0 ? quests[0].f : '无'"></span>
 				&nbsp;
-				<span>
-					晶体: <b>{{crystal}}</b>
-					<b id="exc" @click="excrystal">⊕</b>
-				</span>
+				{{(quests.length !== 0) ? (quests[0].t + "元素力") : ""}}
 			</div>
-			<div>
-				<img src="img/draw/a.png" class="bg" loading="lazy" />
-				<img src="img/draw/b.png" class="bord" loading="lazy" />
+			<div id="topline">
+				<button @click="change('handbook', !handbook)">🔍</button>
+				<button @click="change('reaction', !reaction)">🧫</button>
+				<button @click="change('fty', !fty)">💥</button>
+				<button @click="change('h', !h)">📖</button>
+				<button @click="change('shop', !shop)">💰</button>
+				<button @click="change('draw', !draw)" v-show="connectType !== 1">🌠</button>
 			</div>
-			<div class="vp">&nbsp;</div>
-			<button class="drawBtn btn" @click="oneDraw" style="background-color: #CEF">单次置换</button>
-			<button class="drawBtn btn" style="background-color: #FEC" @click="altDraw">十次置换</button>
-		</div>
-		<div id="handbook" v-show="handbook">
-			<div
-				style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
-				<div class="details">
-					<summary class="a">笔记</summary>
-					<p>金属活性: K＞Ca＞Na＞Mg＞Al＞Zn＞Fe＞Sn＞Pb＞(H)＞Cu＞Hg＞Ag＞Pt＞Au</p>
-					<div class="notes" v-for="(value, key, index) in chemist.elements" @click="changeSub"
-						v-if="!key.includes('<') && key != 'OH'">
-						<span class="a">{{value.atomic}}</span>
-						<br />
-						<b v-html="altSub ? chemist.sub[key] : key"></b>
-						<br />
-						<br />
-						<span class="v">{{format(value.valence)}}</span>
-					</div>
-					<br />
-
+			<div id="ballm" v-show="ballm"></div>
+			<div id="draw" v-show="draw">
+				<div
+					style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
+					<span>元素力: <b>{{force}}</b> / 30
+						<b id="exf" @click="exforce" v-show="connectType !== 1">⊕</b>
+					</span>
+					&nbsp;
+					<span>
+						晶体: <b>{{crystal}}</b>
+						<b id="exc" @click="excrystal">⊕</b>
+					</span>
 				</div>
-				<div class="details">
-					<summary class="a">属性</summary>
-					<br />
-					<div v-for="(value, key) in attrs" @click="explain(key)">
-						<span class="n">{{attrTom[ key ]}}</span>
-						<span class="n" style="float:right">{{value}}/50</span>
-					</div>
+				<div>
+					<img src="img/draw/a.png" class="bg" loading="lazy" />
+					<img src="img/draw/b.png" class="bord" loading="lazy" />
 				</div>
-				<div class="details">
-					<summary class="a">器皿</summary>
-					<br />
-					<div v-for="(value, key) in equi" class="acts">
-						<span class="n" @click="showAct(key, value, $event, true)">{{value.name}}</span>
-						<div class="h"
-							:style="value.con ? 'pointer-events: all;opacity: 1;' : 'pointer-events: none;opacity: 0'">
-							<button @click="uset(key, value, $event)" class="btnt"
-								:style="(usingt.name == value.name) ? 'background-color: rgba(248, 255, 168, 0.5)' : ''">
-								<img :src="'img/equi/' + key + '.png'" loading="lazy" />
-							</button>
+				<div class="vp">&nbsp;</div>
+				<button class="drawBtn btn" @click="oneDraw" style="background-color: #CEF">单次置换</button>
+				<button class="drawBtn btn" style="background-color: #FEC" @click="altDraw">十次置换</button>
+			</div>
+			<div id="handbook" v-show="handbook">
+				<div
+					style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
+					<div class="details">
+						<summary class="a">笔记</summary>
+						<p>金属活性: K＞Ca＞Na＞Mg＞Al＞Zn＞Fe＞Sn＞Pb＞(H)＞Cu＞Hg＞Ag＞Pt＞Au</p>
+						<div class="notes" v-for="(value, key, index) in chemist.elements" @click="changeSub"
+							v-if="!key.includes('<') && key != 'OH'">
+							<span class="a">{{value.atomic}}</span>
 							<br />
-							<div class="sidebar">
-								{{value.intro}}
-							</div>
-							<div style="background-image: url(img/tbc.png)" class="bg"
-								@click="showAct(key, value, $event, true)"></div>
+							<b v-html="altSub ? chemist.sub[key] : key"></b>
+							<br />
+							<br />
+							<span class="v">{{format(value.valence)}}</span>
+						</div>
+						<br />
+
+					</div>
+					<div class="details">
+						<summary class="a">属性</summary>
+						<br />
+						<div v-for="(value, key) in attrs" @click="explain(key)">
+							<span class="n">{{attrTom[ key ]}}</span>
+							<span class="n" style="float:right">{{value}}/50</span>
 						</div>
 					</div>
-				</div>
-				<div class="details" :style="detailsQue.o ? 'position: relative;z-index: -1;' : 'position: static'">
-					<summary class="a">元素</summary>
-					<br />
-					<div v-for="(value, key) in acts" class="acts">
-						<span class="n" @click="showAct(key, value, $event)">{{key}}</span>
-						<div class="h"
-							:style="value.con ? 'pointer-events: all;opacity: 1;' : 'pointer-events: none;opacity: 0'">
-							<button @click="lvlUp(key, value)" @touchstart="changeForm(true, value, $event)"
-								@touchend="changeForm(false)" @mousedown="changeForm(true, value, $event)"
-								@mouseup="changeForm(false)">
-								<img :src="'img/act/' + key + '/' + (value.form ? 'c' : 'a') + '.png'" loading="lazy" />
-							</button>
-							<br />
-							<div :style="'background-image: url(img/act/' + key + '/b.png)'" class="bg"
-								@click="showAct(key, value, $event)"></div>
-							<div class="sidebar">
-								<span class="n">
-									等级: {{value.lvl}}
-								</span>
-								<div class="htp"
-									:style="'text-align: center;overflow: visiable;white-space: nowrap;width:' + ( value.xp / 10 / prop[key] ) + '%;background-color:rgba(0, 200,' + ( value.xp * 12.8 + 128 ) + ', ' + ( value.xp / 1000 / prop[key] ) + ');'">
-									<span class="n">
-										{{value.xp}} / {{Math.round(1000 * prop[key])}}
-									</span>
+					<div class="details">
+						<summary class="a">器皿</summary>
+						<br />
+						<div v-for="(value, key) in equi" class="acts">
+							<span class="n" @click="showAct(key, value, $event, true)">{{value.name}}</span>
+							<div class="h"
+								:style="value.con ? 'pointer-events: all;opacity: 1;' : 'pointer-events: none;opacity: 0'">
+								<button @click="uset(key, value, $event)" class="btnt"
+									:style="(usingt.name == value.name) ? 'background-color: rgba(248, 255, 168, 0.5)' : ''">
+									<img :src="'img/equi/' + key + '.png'" loading="lazy" />
+								</button>
+								<br />
+								<div class="sidebar">
+									{{value.intro}}
 								</div>
+								<div style="background-image: url(img/tbc.png)" class="bg"
+									@click="showAct(key, value, $event, true)"></div>
 							</div>
-							<button class="btn"
-								style="position: fixed;right: 30px;bottom: 100px;z-index: 18;width: 60px;height: 30px;background-color: #DC5853;color: #FFF;line-height: 30px;box-shadow: 0 1px 5px #CA7676;border: 1px solid #AA4C4D"
-								@click="joinAdven">实验</button>
+						</div>
+					</div>
+					<div class="details" :style="detailsQue.o ? 'position: relative;z-index: -1;' : 'position: static'">
+						<summary class="a">元素</summary>
+						<br />
+						<div v-for="(value, key) in acts" class="acts">
+							<span class="n" @click="showAct(key, value, $event)">{{key}}</span>
+							<div class="h"
+								:style="value.con ? 'pointer-events: all;opacity: 1;' : 'pointer-events: none;opacity: 0'">
+								<button @click="lvlUp(key, value)" @touchstart="changeForm(true, value, $event)"
+									@touchend="changeForm(false)" @mousedown="changeForm(true, value, $event)"
+									@mouseup="changeForm(false)">
+									<img :src="'img/act/' + key + '/' + (value.form ? 'c' : 'a') + '.png'"
+										loading="lazy" />
+								</button>
+								<br />
+								<div :style="'background-image: url(img/act/' + key + '/b.png)'" class="bg"
+									@click="showAct(key, value, $event)"></div>
+								<div class="sidebar">
+									<span class="n">
+										等级: {{value.lvl}}
+									</span>
+									<div class="htp"
+										:style="'text-align: center;overflow: visiable;white-space: nowrap;width:' + ( value.xp / 10 / prop[key] ) + '%;background-color:rgba(0, 200,' + ( value.xp * 12.8 + 128 ) + ', ' + ( value.xp / 1000 / prop[key] ) + ');'">
+										<span class="n">
+											{{value.xp}} / {{Math.round(1000 * prop[key])}}
+										</span>
+									</div>
+								</div>
+								<button class="btn"
+									style="position: fixed;right: 30px;bottom: 100px;z-index: 18;width: 60px;height: 30px;background-color: #DC5853;color: #FFF;line-height: 30px;box-shadow: 0 1px 5px #CA7676;border: 1px solid #AA4C4D"
+									@click="joinAdven">实验</button>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<input id="search" onblur="app.search( this.value )" :placeholder="`搜索${chemist.x.length}个方程式……`" />
-			<div v-for="item in searchRes" class="ressa">
-				<div class="ress" v-for="(value, key, index) in item.f" @click="showSv(item)">
-					<span class="n" :style="'opacity: ' + (item.sv ? 1 : 0)" @click="showSv(item)">{{value == 1 ? "" :
-						value}}</span>
-					<b v-html="key" class="e" @click="showSv(item)"></b>
-					<span class="n" @click="showSv(item)">{{Object.keys(item.f).length == (index + 1) ? "" : " +
-						"}}</span>
-				</div>
-				<span class="eq"
-					v-html="(item.sv ? '=' : '-') + (item.cost ? `<sup style='font-size: 25%'>(${item.cost})</sup>` : '')"
-					@click="showSv(item)"></span>
-				<div class="ress" v-for="(value, key, index) in item.t" @click="showSv(item)">
-					<span class="n" :style="'opacity: ' + (item.sv ? 1 : 0)" @click="showSv(item)">{{value == 1 ? "" :
-						value}}</span>
-					<b v-html="key" class="e" @click="showSv(item)"></b>
-					<span class="n" @click="showSv(item)">{{Object.keys(item.t).length == (index + 1) ? "" : " +
-						"}}</span>
-				</div>
-				<span class="a"
-					v-html="item.y > 0 ? ('<span style=color:#AAF>' + item.y ) : ('<span style=color:#FAA>' + ( -item.y ))"
-					@click="showSv(item)"></span>
-			</div>
-			<br />
-			<br />
-			<br />
-		</div>
-		<div id="reaction" v-show="reaction">
-			<div class="ressa"
-				style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
-				<div class="ress" v-for="(value, key, index) in matched.f" @click="showSv(matched)">
-					<span class="n" :style="'opacity: ' + (matched.sv ? 1 : 0)" @click="showSv(matched)">{{value == 1 ?
-						"" : value}}</span>
-					<b v-html="key" class="e" @click="showSv(matched)"></b>
-					<span class="n" @click="showSv(matched)">{{Object.keys(matched.f).length == (index + 1) ? "" : " +
-						"}}</span>
-				</div>
-				<span class="eq"
-					v-html="(matched.sv ? '=' : '-') + (matched.cost ? `<sup style='font-size: 25%'>(${matched.cost})</sup>` : '')"
-					@click="showSv(matched)" v-show="matched" style="color: #AFFFFF"></span>
-				<div class="ress" v-for="(value, key, index) in matched.t" @click="showSv(matched)">
-					<span class="n" :style="'opacity: ' + (matched.sv ? 1 : 0)" @click="showSv(matched)">{{value == 1 ?
-						"" : value}}</span>
-					<b v-html="key" class="e" @click="showSv(matched)"></b>
-					<span class="n" @click="showSv(matched)">{{Object.keys(matched.t).length == (index + 1) ? "" : " +
-						"}}</span>
-				</div>
-				<span class="a"
-					v-html="matched.y > 0 ? ('<span style=color:#AAF>' + matched.y ) : ('<span style=color:#FAA>' + ( -matched.y ))"
-					@click="showSv(matched)" v-show="matched"></span>
-				<br />
-			</div>
-			<br />
-			<div id="can" @touchstart="startRec" @touchend="stopRec" @mousedown="startRec" @mouseup="stopRec"
-				@mouseout="stopRec">🗑️</div>
-			<div class="mades" v-for="(item, index) in maked">
-				<div class="notes" @click="recycle(index, $event)">
-					<span class="a">{{index + 1}}</span>
-					<br />
-					<b v-html="item"></b>
-				</div>
-			</div>
-		</div>
-		<div id="fty" v-show="fty">
-			<div id="env"
-				style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
-				<button v-for="(value, key) in chemist.env" @click="changeEnv(key)"
-					:style="env.now.icon == value.icon ? 'background-color: rgba(200, 255, 88, 0.6)' : ''">{{value.icon}}</button>
-				<span>
-					<br />
-					元素力: {{force}} / {{fcost}}
-					<br />
-					剩余时间: {{env.cd}}回合
-				</span>
-				<br />
-				<span>
-					反应效率:
-					<span style="color: #FAA">{{((env.now.effect.exo) * 100).toFixed(1)
-						}}</span>
-					/
-					<span style="color: #AAF">{{((env.now.effect.end) * 100).toFixed(1)
-						}}</span>
-					%
-				</span>
-				<br />
-				<span>
-					反应成功率:
-					<span style="color: #FAA">{{(env.now.effect.suc[0] + env.suc).toFixed(1)
-						}}</span>
-					/
-					<span style="color: #AAF">{{(env.now.effect.suc[1] + env.suc).toFixed(1)
-						}}</span>
-					%
-				</span>
-			</div>
-			<div>
-				<div class="notes" v-for="(value, key, index) in f" @click="save(f,false,true)">
-					<span class="n">{{value == 1 ? "" : value}}</span>
-					<b v-html="key" class="e"></b>
-					<span class="n">{{Object.keys(f).length == (index + 1) ? "" : " + "}}</span>
-				</div>
-				<span class="eq" v-show="Object.keys(f).length > 0" @click="findEq(f)">=</span>
-				<div class="notes" v-for="(value, key, index) in t.t" @click="save(t.t, true)">
-					<span class="n">{{value == 1 ? "" : value}}</span>
-					<b v-html="key" class="e"></b>
-					<span class="n">{{Object.keys(t.t).length == (index + 1) ? "" : " + "}}</span>
-				</div>
-			</div>
-		</div>
-		<div id="shop" v-show="shop">
-			<div class="notes" v-for="(value, key, index) in goods" @click="buy(key)"
-				:style="key[0] == 'l' ? 'width: 100%; background: none; border: none;' : ''">
-				<div v-show="key[0] != 'l'">
-					<br />
-					<b v-html="key[0] == '*' ? attrTom[key.replace('*', '')] : key" class="e"></b>
-					<br />
-					<br />
-					<span class="n" v-html="value"></span>
-				</div>
-				<div v-show="key[0] == 'l'">
-					<br />
-					<b style="position: relative; bottom: -1em;" v-html="value" class="e"></b>
-					<hr style="position: relative; bottom: -1.5em;" />
-				</div>
-			</div>
-			<hr style="display: block;width: 100%; height: 100px; opacity: 0" />
-		</div>
-		<div id="h" v-show="h">
-			<div
-				style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
-				<span class="n">熵增: </span>
-				<b class="e" id="h1">{{h2.toFixed(1)}}</b>
-				<br />
-				<span class="n">熵减: </span>
-				<b class="e" id="h2">{{h1.toFixed(1)}}</b>
-				<button class="fullBtn" id="stcry" @click="stcry">熵结晶</button>
-				<div v-show="connectType === 1" id="enre">
-					<hr />
-					<span class="n">{{name.p1}}:{{Number(msg.ht1).toFixed(1)}}/{{maxh}}</span>
-					<div class="htp"
-						:style="'width:' + Math.abs( msg.ht1 * 100 / maxh ) + '%;background-color:rgb(' + ( msg.ht1 * 128 / maxh + 128 ) + ', 128, ' + (128 - ( msg.ht1 < 0 ? (msg.ht1 * 0.128) : 0 )) + ');'">
+				<input id="search" onblur="app.search( this.value )" :placeholder="`搜索${chemist.x.length}个方程式……`" />
+				<div v-for="item in searchRes" class="ressa">
+					<div class="ress" v-for="(value, key, index) in item.f" @click="showSv(item)">
+						<span class="n" :style="'opacity: ' + (item.sv ? 1 : 0)"
+							@click="showSv(item)">{{value == 1 ? "" : value}}</span>
+						<b v-html="key" class="e" @click="showSv(item)"></b>
+						<span class="n"
+							@click="showSv(item)">{{Object.keys(item.f).length == (index + 1) ? "" : " + "}}</span>
 					</div>
-					<br />
-					<br />
-					<span class="n">{{name.p2}}:{{Number(msg.ht2).toFixed(1)}}/{{maxh}}</span>
-					<div class="htp"
-						:style="'width:' + Math.abs( msg.ht2 * 100 / maxh ) + '%;background-color:rgb(' + ( msg.ht2 * 128 / maxh + 128 ) + ', 128, ' + (128 - ( msg.ht2 < 0 ? (msg.ht2 * 0.128) : 0 )) + ');'">
+					<span class="eq"
+						v-html="(item.sv ? '=' : '-') + (item.cost ? `<sup style='font-size: 25%'>(${item.cost})</sup>` : '')"
+						@click="showSv(item)"></span>
+					<div class="ress" v-for="(value, key, index) in item.t" @click="showSv(item)">
+						<span class="n" :style="'opacity: ' + (item.sv ? 1 : 0)"
+							@click="showSv(item)">{{value == 1 ? "" : value}}</span>
+						<b v-html="key" class="e" @click="showSv(item)"></b>
+						<span class="n"
+							@click="showSv(item)">{{Object.keys(item.t).length == (index + 1) ? "" : " + "}}</span>
 					</div>
+					<span class="a"
+						v-html="item.y > 0 ? ('<span style=color:#AAF>' + item.y ) : ('<span style=color:#FAA>' + ( -item.y ))"
+						@click="showSv(item)"></span>
+				</div>
+				<br />
+				<br />
+				<br />
+			</div>
+			<div id="reaction" v-show="reaction">
+				<div class="ressa"
+					style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
+					<div class="ress" v-for="(value, key, index) in matched.f" @click="showSv(matched)">
+						<span class="n" :style="'opacity: ' + (matched.sv ? 1 : 0)"
+							@click="showSv(matched)">{{value == 1 ? "" : value}}</span>
+						<b v-html="key" class="e" @click="showSv(matched)"></b>
+						<span class="n"
+							@click="showSv(matched)">{{Object.keys(matched.f).length == (index + 1) ? "" : " + "}}</span>
+					</div>
+					<span class="eq"
+						v-html="(matched.sv ? '=' : '-') + (matched.cost ? `<sup style='font-size: 25%'>(${matched.cost})</sup>` : '')"
+						@click="showSv(matched)" v-show="matched" style="color: #AFFFFF"></span>
+					<div class="ress" v-for="(value, key, index) in matched.t" @click="showSv(matched)">
+						<span class="n" :style="'opacity: ' + (matched.sv ? 1 : 0)"
+							@click="showSv(matched)">{{value == 1 ? "" : value}}</span>
+						<b v-html="key" class="e" @click="showSv(matched)"></b>
+						<span class="n"
+							@click="showSv(matched)">{{Object.keys(matched.t).length == (index + 1) ? "" : " + "}}</span>
+					</div>
+					<span class="a"
+						v-html="matched.y > 0 ? ('<span style=color:#AAF>' + matched.y ) : ('<span style=color:#FAA>' + ( -matched.y ))"
+						@click="showSv(matched)" v-show="matched"></span>
 					<br />
-					<br />
-					<button class="fullBtn" @click="giveUp">投降</button>
+				</div>
+				<br />
+				<div id="can" @touchstart="startRec" @touchend="stopRec" @mousedown="startRec" @mouseup="stopRec"
+					@mouseout="stopRec">🗑️</div>
+				<div class="mades" v-for="(item, index) in maked">
+					<div class="notes" @click="recycle(index, $event)">
+						<span class="a">{{index + 1}}</span>
+						<br />
+						<b v-html="item"></b>
+					</div>
 				</div>
 			</div>
-			<br />
-			<div class="details" id="more">
-				<summary class="a">更多</summary>
-				<br />
-				<span class="n">服务器地址:</span>
-				&nbsp;
-				<input v-model="ip" />
-				<input type="button" class="select" @click="confirm('选择玩家？', choosep, 'p1', 'p2')" v-model="player"
-					id="choosePlayer">
-				<button id="connect" @click="tryConnect" :disabled="connectType == 2"
-					:style="'background-color:' + (connectType == 2 ? '#DDD;' : ((connectType == -1 || connectType == 1) ? '#FE6565' : ''))">{{connectType
-					== 1 ? "断开" : ""}}连接</button>
-				<br />
-				<span class="n">
-					{{typemsg[ connectType ]}}
+			<div id="fty" v-show="fty">
+				<div id="env"
+					style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
+					<button v-for="(value, key) in chemist.env" @click="changeEnv(key)"
+						:style="env.now.icon == value.icon ? 'background-color: rgba(200, 255, 88, 0.6)' : ''">{{value.icon}}</button>
+					<span>
+						<br />
+						元素力: {{force}} / {{fcost}}
+						<br />
+						剩余时间: {{env.cd}}回合
+					</span>
 					<br />
-					<span style="font-size: 50%;color: #DDD;">{{err ? err : ""}}</span>
-				</span>
-				<hr />
-				<div id="setb">
-					<span class="n">“回收”按钮</span>
-					<label class="switch">
-						<input type="checkbox" v-model="settings.srecycle" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“热量”显示</span>
-					<label class="switch">
-						<input type="checkbox" v-model="settings.sht" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“环境”显示</span>
-					<label class="switch">
-						<input type="checkbox" v-model="settings.senv" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“元素力”显示</span>
-
-					<label class="switch">
-						<input type="checkbox" v-model="settings.sf" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“服务器”自动连接</span>
-
-					<label class="switch">
-						<input type="checkbox" v-model="settings.ac" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“暗”自动切换</span>
-
-					<label class="switch">
-						<input type="checkbox" v-model="settings.an" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“暗”模式</span>
-
-					<label class="switch">
-						<input type="checkbox" v-model="settings.am" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“收起”整理</span>
-					<label class="switch">
-						<input type="checkbox" v-model="settings.as" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“元素”堆叠</span>
-					<label class="switch">
-						<input type="checkbox" v-model="settings.ap" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“高级”效果</span>
-					<label class="switch">
-						<input type="checkbox" @click="removeBlur($event)" :checked="ex" />
-						<span class="slider"></span>
-					</label>
-					<hr />
-					<span class="n">“字体”种类</span>
-					<input type="button" class="switch select"
-						@click="confirm('选择字体？', chooseFont, 'consola', 'silver')" v-model="settings.font">
-					<hr />
-					<span class="n">“字体”大小</span>
-					<span class="setInp">
-						<span class="a">{{this.settings.fs}}</span>
-						<input type="range" @input="sfs($event)" min="95" max="110" :value="settings.fs"
-							style="width: 50px">
+					<span>
+						反应效率:
+						<span style="color: #FAA">{{((env.now.effect.exo) * 100).toFixed(1)
+			     }}</span>
+						/
+						<span style="color: #AAF">{{((env.now.effect.end) * 100).toFixed(1)
+			     }}</span>
+						%
+					</span>
+					<br />
+					<span>
+						反应成功率:
+						<span style="color: #FAA">{{(env.now.effect.suc[0] + env.suc).toFixed(1)
+			     }}</span>
+						/
+						<span style="color: #AAF">{{(env.now.effect.suc[1] + env.suc).toFixed(1)
+			     }}</span>
+						%
+					</span>
+				</div>
+				<div>
+					<div class="notes" v-for="(value, key, index) in f" @click="save(f,false,true)">
+						<span class="n">{{value == 1 ? "" : value}}</span>
+						<b v-html="key" class="e"></b>
+						<span class="n">{{Object.keys(f).length == (index + 1) ? "" : " + "}}</span>
+					</div>
+					<span class="eq" v-show="Object.keys(f).length > 0" @click="findEq(f)">=</span>
+					<div class="notes" v-for="(value, key, index) in t.t" @click="save(t.t, true)">
+						<span class="n">{{value == 1 ? "" : value}}</span>
+						<b v-html="key" class="e"></b>
+						<span class="n">{{Object.keys(t.t).length == (index + 1) ? "" : " + "}}</span>
+					</div>
+				</div>
+			</div>
+			<div id="shop" v-show="shop">
+				<div class="notes" v-for="(value, key, index) in goods" @click="buy(key)"
+					:style="key[0] == 'l' ? 'width: 100%; background: none; border: none;' : ''">
+					<div v-show="key[0] != 'l'">
+						<br />
+						<b v-html="key[0] == '*' ? attrTom[key.replace('*', '')] : key" class="e"></b>
+						<br />
+						<br />
+						<span class="n" v-html="value"></span>
+					</div>
+					<div v-show="key[0] == 'l'">
+						<br />
+						<b style="position: relative; bottom: -1em;" v-html="value" class="e"></b>
+						<hr style="position: relative; bottom: -1.5em;" />
+					</div>
+				</div>
+				<hr style="display: block;width: 100%; height: 100px; opacity: 0" />
+			</div>
+			<div id="h" v-show="h">
+				<div
+					style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">
+					<span class="n">熵增: </span>
+					<b class="e" id="h1">{{h2.toFixed(1)}}</b>
+					<br />
+					<span class="n">熵减: </span>
+					<b class="e" id="h2">{{h1.toFixed(1)}}</b>
+					<button class="fullBtn" id="stcry" @click="stcry">熵结晶</button>
+					<div v-show="connectType === 1" id="enre">
+						<hr />
+						<span class="n">{{name.p1}}:{{Number(msg.ht1).toFixed(1)}}/{{maxh}}</span>
+						<div class="htp"
+							:style="'width:' + Math.abs( msg.ht1 * 100 / maxh ) + '%;background-color:rgb(' + ( msg.ht1 * 128 / maxh + 128 ) + ', 128, ' + (128 - ( msg.ht1 < 0 ? (msg.ht1 * 0.128) : 0 )) + ');'">
+						</div>
+						<br />
+						<br />
+						<span class="n">{{name.p2}}:{{Number(msg.ht2).toFixed(1)}}/{{maxh}}</span>
+						<div class="htp"
+							:style="'width:' + Math.abs( msg.ht2 * 100 / maxh ) + '%;background-color:rgb(' + ( msg.ht2 * 128 / maxh + 128 ) + ', 128, ' + (128 - ( msg.ht2 < 0 ? (msg.ht2 * 0.128) : 0 )) + ');'">
+						</div>
+						<br />
+						<br />
+						<button class="fullBtn" @click="giveUp">投降</button>
+					</div>
+				</div>
+				<br />
+				<div class="details" id="more">
+					<summary class="a">更多</summary>
+					<br />
+					<span class="n">服务器地址:</span>
+					&nbsp;
+					<input v-model="ip" />
+					<input type="button" class="select" @click="confirm('选择玩家？', choosep, 'p1', 'p2')" v-model="player"
+						id="choosePlayer">
+					<button id="connect" @click="tryConnect" :disabled="connectType == 2"
+						:style="'background-color:' + (connectType == 2 ? '#DDD;' : ((connectType == -1 || connectType == 1) ? '#FE6565' : ''))">{{connectType == 1 ? "断开" : ""}}连接</button>
+					<br />
+					<span class="n">
+						{{typemsg[ connectType ]}}
+						<br />
+						<span style="font-size: 50%;color: #DDD;">{{err ? err : ""}}</span>
 					</span>
 					<hr />
-					<span class="n">“元素”大小</span>
-					<input v-model="settings.bw" class="setInp" type="number" />
-					<hr />
-					<span class="n">“元素”上限</span>
-					<input v-model="settings.maxe" class="setInp" type="number" />
-					<hr />
-					<span class="n">“安装”模组</span>
-					<input style="display:none" type="file" id="jsmod" @change="addMod($event)"
-						accept="application/javascript, text/javascript, .js" />
-					<label for="jsmod" class="file setInp">选择文件</label>
-					<br />
-					<p class="a">
-						模组列表:
-					<ol>
-						<li v-for="(value, key) in mods" @click="disabledMod(key)" @touchstart="deleteMod(key, $event)"
-							@touchend="deleteMod(false, $event)"
-							:style="'color: ' + (mods.dismod.includes(key) ? '#EAA' : '#FFF')" v-if="key != 'dismod'">
-							{{key}}</li>
-					</ol>
-					</p>
-					<div id="createdSettings">
-						<div v-for="(value, key) in modSettings" v-if="Object.keys(modSettings).length > 0"
-							class="modSettingsContainer">
-							<div v-if="value.temp == 'switch'">
-								<hr />
-								<span class="n">{{value.name}}</span>
-								<label class="switch">
-									<input type="checkbox" v-model="settings[value.key]"
+					<div id="setb">
+						<span class="n">“回收”按钮</span>
+						<label class="switch">
+							<input type="checkbox" v-model="settings.srecycle" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“热量”显示</span>
+						<label class="switch">
+							<input type="checkbox" v-model="settings.sht" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“环境”显示</span>
+						<label class="switch">
+							<input type="checkbox" v-model="settings.senv" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“元素力”显示</span>
+
+						<label class="switch">
+							<input type="checkbox" v-model="settings.sf" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“服务器”自动连接</span>
+
+						<label class="switch">
+							<input type="checkbox" v-model="settings.ac" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“暗”自动切换</span>
+
+						<label class="switch">
+							<input type="checkbox" v-model="settings.an" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“暗”模式</span>
+
+						<label class="switch">
+							<input type="checkbox" v-model="settings.am" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“收起”整理</span>
+						<label class="switch">
+							<input type="checkbox" v-model="settings.as" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“元素”堆叠</span>
+						<label class="switch">
+							<input type="checkbox" v-model="settings.ap" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“高级”效果</span>
+						<label class="switch">
+							<input type="checkbox" @click="removeBlur($event)" :checked="ex" />
+							<span class="slider"></span>
+						</label>
+						<hr />
+						<span class="n">“字体”种类</span>
+						<input type="button" class="switch select"
+							@click="confirm('选择字体？', chooseFont, 'consola', 'silver')" v-model="settings.font">
+						<hr />
+						<span class="n">“字体”大小</span>
+						<span class="setInp">
+							<span class="a">{{this.settings.fs}}</span>
+							<input type="range" @input="sfs($event)" min="95" max="110" :value="settings.fs"
+								style="width: 50px">
+						</span>
+						<hr />
+						<span class="n">“元素”大小</span>
+						<input v-model="settings.bw" class="setInp" type="number" />
+						<hr />
+						<span class="n">“元素”上限</span>
+						<input v-model="settings.maxe" class="setInp" type="number" />
+						<hr />
+						<span class="n">“安装”模组</span>
+						<input style="display:none" type="file" id="jsmod" @change="addMod($event)"
+							accept="application/javascript, text/javascript, .js" />
+						<label for="jsmod" class="file setInp">选择文件</label>
+						<br />
+						<p class="a">
+							模组列表:
+						<ol>
+							<li v-for="(value, key) in mods" @click="disabledMod(key)"
+								@touchstart="deleteMod(key, $event)" @touchend="deleteMod(false, $event)"
+								:style="'color: ' + (mods.dismod.includes(key) ? '#EAA' : '#FFF')"
+								v-if="key != 'dismod'">{{key}}</li>
+						</ol>
+						</p>
+						<div id="createdSettings">
+							<div v-for="(value, key) in modSettings" v-if="Object.keys(modSettings).length > 0"
+								class="modSettingsContainer">
+								<div v-if="value.temp == 'switch'">
+									<hr />
+									<span class="n">{{value.name}}</span>
+									<label class="switch">
+										<input type="checkbox" v-model="settings[value.key]"
+											@change="(value.stateChange && value.stateChange($event))" />
+										<span class="slider"></span>
+									</label>
+									<div v-html="value.more ? value.more : ''"></div>
+								</div>
+								<div v-if="value.temp == 'input'">
+									<hr />
+									<span class="n">{{value.name}}</span>
+									<input type="number" class="switch" v-model="settings[value.key]"
 										@change="(value.stateChange && value.stateChange($event))" />
-									<span class="slider"></span>
-								</label>
-								<div v-html="value.more ? value.more : ''"></div>
-							</div>
-							<div v-if="value.temp == 'input'">
-								<hr />
-								<span class="n">{{value.name}}</span>
-								<input type="number" class="switch" v-model="settings[value.key]"
-									@change="(value.stateChange && value.stateChange($event))" />
-								<div v-html="value.more ? value.more : ''"></div>
+									<div v-html="value.more ? value.more : ''"></div>
+								</div>
 							</div>
 						</div>
 					</div>
+					<hr />
+					<span class="n">版本</span>
+					<span class="setInp n">{{version}}&nbsp;</span>
+					<hr />
+					<button @click="reset" class="fullBtn">重新开始</button>
+					<hr />
+					<button onclick="(app.srm = !app.srm);app.change('h', false, false)" class="fullBtn"
+						style="background-color: #AFC">查看教程</button>
+					<br />
+					<br />
+					<span style="color: #FFF">2025©yun</span>
+					<br />
+					<br />
+					<br />
 				</div>
-				<hr />
-				<span class="n">版本</span>
-				<span class="setInp n">{{version}}&nbsp;</span>
-				<hr />
-				<button @click="reset" class="fullBtn">重新开始</button>
-				<hr />
-				<button onclick="(app.srm = !app.srm);app.change('h', false, false)" class="fullBtn"
-					style="background-color: #AFC">查看教程</button>
 				<br />
-				<br />
-				<span style="color: #FFF">2025©yun</span>
-				<br />
-				<br />
-				<br />
+				<audio id="bgm" src="#" style="position:relative;z-index: 100"></audio>
 			</div>
-			<br />
-			<audio id="bgm" src="#" style="position:relative;z-index: 100"></audio>
-		</div>
-		<div id="bodyline">
-			<div id="area">
-				<span id="valence">{{format(pressedVal)}}</span>
-				<b v-html="press(text)" @click="clear()" id="showEle"></b>
-				<i v-html="((this.alting ? '(' : '') + this.press( this.alts ))"></i>
-				<button @click="alt(true)" style="background-color: #FAD" v-show="!alting">(</button>
-				<button @click="alt(false)" style="background-color:#DAF" v-show="alting">)</button>
-				<button
-					:disabled="(!pressedVal.includes(0) && !(Object.values(chemist.sub).includes(press(text)))) || alting"
-					:style="'background-color:' + (((!pressedVal.includes(0) && !(Object.values(chemist.sub).includes(press(text)))) || alting) ? '#DDD;' : '#AFD;')"
-					@click="make">制取</button>
-				<button @click="altRecycle" v-show="settings.srecycle"
-					:disabled="(!pressedVal.includes(0) && !(Object.values(chemist.sub).includes(press(text)))) || alting"
-					:style="'background-color:' + (((!pressedVal.includes(0) && !(Object.values(chemist.sub).includes(press(text)))) || alting) ? '#DDD;' : '#AFA;')">回收</button>
-				<button @click="next" :style="'background-color: ' + ((pushing || !cannext) ? '#DDD' : '#ADF')"
-					:disabled="(pushing || !cannext)">下回</button>
-			</div>
-		</div>
-		<div id="bgi" :style="settings.am ? 'transform: rotate(180deg);opacity: 0.1' : ''"></div>
-		<div id="bottomline" :style="'height: ' + (openBottomline ? 120 : 7) + 'px'">
-			<div id="troll" @click="hidb">—</div>
-			<div class="hand" v-if="!settings.ap">
-				<div class="brand" v-for="(item, index) in brand" @click="add(item, index, $event)"
-					:style="'width: calc( ' + settings.bw + '% - 7.5px );'">
-					<b :style="'color: ' + ((colors[item]) || '#FFF') + ';font-size: calc(' + settings.bw / 1.5 + 'vw - 7.5px );'"
-						v-html="item"></b>
+			<div id="bodyline">
+				<div id="area">
+					<span id="valence">{{format(pressedVal)}}</span>
+					<b v-html="press(text)" @click="clear()" id="showEle"></b>
+					<i v-html="((this.alting ? '(' : '') + this.press( this.alts ))"></i>
+					<button @click="alt(true)" style="background-color: #FAD" v-show="!alting">(</button>
+					<button @click="alt(false)" style="background-color:#DAF" v-show="alting">)</button>
+					<button
+						:disabled="(!pressedVal.includes(0) && !(Object.values(chemist.sub).includes(press(text)))) || alting"
+						:style="'background-color:' + (((!pressedVal.includes(0) && !(Object.values(chemist.sub).includes(press(text)))) || alting) ? '#DDD;' : '#AFD;')"
+						@click="make">制取</button>
+					<button @click="altRecycle" v-show="settings.srecycle"
+						:disabled="(!pressedVal.includes(0) && !(Object.values(chemist.sub).includes(press(text)))) || alting"
+						:style="'background-color:' + (((!pressedVal.includes(0) && !(Object.values(chemist.sub).includes(press(text)))) || alting) ? '#DDD;' : '#AFA;')">回收</button>
+					<button @click="next" :style="'background-color: ' + ((pushing || !cannext) ? '#DDD' : '#ADF')"
+						:disabled="(pushing || !cannext)">下回</button>
 				</div>
 			</div>
-			<div class="hand" v-if="settings.ap">
-				<div class="brand" v-for="(value, key, index) in prand" @click="add(key, -1, $event)"
-					:style="'width: calc( ' + settings.bw + '% - 7.5px );'">
-					<span class="n">{{showCount(index, value)}}</span>
-					<b :style="'color: ' + ((colors[key]) || '#FFF') + ';font-size: calc(' + settings.bw / 1.5 + 'vw - 7.5px );'"
-						v-html="key"></b>
+			<div id="bgi" :style="settings.am ? 'transform: rotate(180deg);opacity: 0.1' : ''"></div>
+			<div id="bottomline" :style="'height: ' + (openBottomline ? 120 : 7) + 'px'">
+				<div id="troll" @click="hidb">—</div>
+				<div class="hand" v-if="!settings.ap">
+					<div class="brand" v-for="(item, index) in brand" @click="add(item, index, $event)"
+						:style="'width: calc( ' + settings.bw + '% - 7.5px );'">
+						<b :style="'color: ' + ((colors[item]) || '#FFF') + ';font-size: calc(' + settings.bw / 1.5 + 'vw - 7.5px );'"
+							v-html="item"></b>
+					</div>
+				</div>
+				<div class="hand" v-if="settings.ap">
+					<div class="brand" v-for="(value, key, index) in prand" @click="add(key, -1, $event)"
+						:style="'width: calc( ' + settings.bw + '% - 7.5px );'">
+						<span class="n">{{showCount(index, value)}}</span>
+						<b :style="'color: ' + ((colors[key]) || '#FFF') + ';font-size: calc(' + settings.bw / 1.5 + 'vw - 7.5px );'"
+							v-html="key"></b>
+					</div>
 				</div>
 			</div>
-		</div>
-		<div id="tip"></div>
-		<div id="conf">
+			<div id="tip"></div>
+			<div id="conf">
 
-		</div>
-		<div id="vr" v-if="srm">
-			<iframe src="readme.html"></iframe>
-		</div>
-		<div id="loadPic">
-			<img src="img/splash.png" />
-			<div class="htp"
-				:style="'width:calc(' + loaded + '% - 10px);background-color:rgb(198, 255,' + ( loaded * 1.28 + 127 ) + ')'"
-				id="loadTp">
 			</div>
-			<span class="a" id="getIn" style="color:#DDD">点击进入游戏</span>
+			<div id="vr" v-if="srm">
+				<iframe src="readme.html"></iframe>
+			</div>
+			<div id="loadPic">
+				<img src="img/splash.png" />
+				<div class="htp"
+					:style="'width:calc(' + loaded + '% - 10px);background-color:rgb(198, 255,' + ( loaded * 1.28 + 127 ) + ')'"
+					id="loadTp">
+				</div>
+				<span class="a" id="getIn" style="color:#DDD">点击进入游戏</span>
+			</div>
+			<div id="impeh" :style="'pointer-events:' + (imped ? 'all' : 'none')" @click="!playing && impe()"></div>
 		</div>
-		<div id="impeh" :style="'pointer-events:' + (imped ? 'all' : 'none')" @click="!playing && impe()"></div>
-	</div>
-	<audio id="aud"></audio>
-</body>
-<script src="js/public/file_reader.js"></script>
-<script src="js/index/vue.js"></script>
-<script src="js/public/axios.js"></script>
-<script src="js/public/anima.js"></script>
-<script src="js/public/dic.js"></script>
-<script src="js/public/phaser.min.js"></script>
-<script src="js/public/lodash.min.js"></script>
-<script src="js/index/index.js"></script>
-<script src="js/index/ball.js"></script>
-
+		<audio id="aud"></audio>
+	</body>
+	<script src="js/public/file_reader.js"></script>
+	<script src="js/index/vue.js"></script>
+	<script src="js/public/axios.js"></script>
+	<script src="js/public/anima.js"></script>
+	<script src="js/public/dic.js"></script>
+	<script src="js/public/phaser.min.js"></script>
+	<script src="js/public/lodash.min.js"></script>
+	<script src="js/index/index.js"></script>
+	<script src="js/index/ball.js"></script>
 </html>
