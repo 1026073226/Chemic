@@ -13,17 +13,26 @@
 		<img src="img/fabric.jpg" id="background" />
 		<div id="app">
 			<button id="present" @click="getPresent" :disabled="!present.require"
-				:style="'filter: grayscale(' + (present.require ? 0 : 1) + ');'">🎁<span
+				:style="'filter: grayscale(' + ( brand.includes( present.require ) ? 0 : 1) + ');'">🎁<span
 					v-html="present.require"></span></button>
 			<button id="ball" @click="change('ballm', !ballm)">🧿</button>
-			<div id="rounds">回合: {{msg.p1e}}/{{msg.p2e}}&nbsp;
+			<div id="rounds">
+				回合 熵值 元素力
+				<br />
+				{{msg.p1e}}/{{msg.p2e}}&nbsp;
 				{{ (settings.sht ? (msg.ht1 + "/" + msg.ht2) : "") }}&nbsp;
 				{{ (settings.sf ? (force + "/" + fcost) : "") }}&nbsp;
 				{{ settings.senv ? env.now.icon : "" }}&nbsp;
-				<br />
-				任务: <span v-html="quests.length > 0 ? quests[0].f : '无'"></span>
-				&nbsp;
-				{{(quests.length !== 0) ? (quests[0].t + "元素力") : ""}}
+			</div>
+			<div class="task-list" @click="(taskListOpen = !taskListOpen)">
+				当前任务: <span v-html="quests.length > 0 ? quests[0].f : '无'"></span>
+				<span v-if="quests.length > 0">{{quests[0].t}}元素力</span>
+				<div class="task-dropdown" :style="'height:' + (taskListOpen ? '4em' : '0') + ';opacity:' + (taskListOpen ? '0.8' : '0')">
+					<div v-for="(quest, index) in quests" :key="index" class="task-item">
+						<span v-html="quest.f"></span>
+						<span>{{quest.t}}元素力</span>
+					</div>
+				</div>
 			</div>
 			<div id="topline">
 				<button @click="change('handbook', !handbook)">🔍</button>
@@ -426,7 +435,7 @@
 					</div>
 					<hr />
 					<span class="n">版本</span>
-					<span class="setInp n">{{version}}&nbsp;</span>
+					<span class="setInp n" onclick="open('https://github.com/1026073226/Chemic/releases')">{{version}}&nbsp;</span>
 					<hr />
 					<button @click="reset" class="fullBtn">重新开始</button>
 					<hr />

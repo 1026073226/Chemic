@@ -20,9 +20,9 @@
 		<div id="pause-menu">
 			<div id="menu-container">
 				<p style="padding-left: 10vw; color: #FFF;">画面质量</p>
-				<input style="margin-left: 5vw; width: 85vw" type="range" min="0.1" max="1" step="0.01" id="qrange"
+				<input style="margin-left: 5vw; width: 85vw" type="range" min="0" max="1" step="0.01" id="qrange"
 					oninput="QUALITY = Number(this.value); document.getElementById('quality').innerText = QUALITY; localStorage.QUALITY = QUALITY" />
-				<span id="quality" class="a" style="background-color: #DDD; color: #FFF; border-radius: 2px; width: 5vw; text-align: center; display: inline-block">1</span>
+				<span id="quality" class="a" style="background-color: #AAA; color: #FFF; border-radius: 2px; width: 5vw; text-align: center; display: inline-block">1</span>
 				<br />
 				<button class="btn" id="jam-out">脱离卡死</button>
 				<button class="btn" id="quit-game">终止实验</button>

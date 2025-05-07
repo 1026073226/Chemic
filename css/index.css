@@ -494,6 +494,7 @@ input[type="range"] {
 	pointer-events: none;
 	margin-left: env(safe-area-inset-left);
 	opacity: 0.8;
+	padding: 5px;
 }
 
 #h1 {
@@ -1119,4 +1120,40 @@ iframe {
 
 .ball-label {
 	pointer-events: none !important;
+}
+
+.task-list {
+	cursor: pointer;
+	position: fixed;
+	right: 0;
+	bottom: 70%;
+	opacity: 0.8;
+	background-color: #888;
+	border-radius: 5px;
+	padding: 5px;
+	z-index: 8;
+	transition: width 386ms;
+	will-change: width;
+}
+.task-dropdown {
+	opacity: 0.8;
+	background-color: #444;
+	border-radius: 5px;
+	padding: 5px;
+	z-index: 9;
+	width: auto;
+	max-height: 4em;
+	overflow: auto;
+	box-sizing: border-box;
+	height: 0;
+	opacity: 0;
+	transition: height 386ms, opacity 386ms;
+	will-change: height, opacity;
+}
+.task-item {
+	padding: 3px;
+	border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.task-item:last-child {
+	border-bottom: none;
 }
