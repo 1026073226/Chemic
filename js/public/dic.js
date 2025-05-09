@@ -64,7 +64,7 @@ const chemist = {
 				exo: 1.05,
 				end: 1.05,
 				suc: 5,
-				prevent: ["wet",
+				prevent: [ "wet",
 					"fog"
 				],
 			},
@@ -74,15 +74,15 @@ const chemist = {
 	elements: {
 		H: {
 			atomic: 1,
-			valence: [1, ]
+			valence: [ 1, ]
 		},
 		Li: {
 			atomic: 3,
-			valence: [1]
+			valence: [ 1 ]
 		},
 		C: {
 			atomic: 6,
-			valence: [2,
+			valence: [ 2,
 				4,
 				-2,
 				-4
@@ -90,7 +90,7 @@ const chemist = {
 		},
 		N: {
 			atomic: 7,
-			valence: [1,
+			valence: [ 1,
 				2,
 				3,
 				4,
@@ -100,31 +100,31 @@ const chemist = {
 		},
 		O: {
 			atomic: 8,
-			valence: [-2]
+			valence: [ -2 ]
 		},
 		F: {
 			atomic: 9,
-			valence: [-1]
+			valence: [ -1 ]
 		},
 		Na: {
 			atomic: 11,
-			valence: [1]
+			valence: [ 1 ]
 		},
 		Mg: {
 			atomic: 12,
-			valence: [2]
+			valence: [ 2 ]
 		},
 		Al: {
 			atomic: 13,
-			valence: [3]
+			valence: [ 3 ]
 		},
 		P: {
 			atomic: 15,
-			valence: [5]
+			valence: [ 5 ]
 		},
 		S: {
 			atomic: 16,
-			valence: [2,
+			valence: [ 2,
 				4,
 				6,
 				-2
@@ -132,118 +132,118 @@ const chemist = {
 		},
 		Cl: {
 			atomic: 17,
-			valence: [-1,
+			valence: [ -1,
 				5
 			]
 		},
 		K: {
 			atomic: 19,
-			valence: [1]
+			valence: [ 1 ]
 		},
 		Ca: {
 			atomic: 20,
-			valence: [2]
+			valence: [ 2 ]
 		},
 		Fe: {
 			atomic: 26,
-			valence: [2,
+			valence: [ 2,
 				3
 			]
 		},
 		Cu: {
 			atomic: 29,
-			valence: [1,
+			valence: [ 1,
 				2
 			]
 		},
 		Ag: {
 			atomic: 47,
-			valence: [1]
+			valence: [ 1 ]
 		},
 		Au: {
 			atomic: 79,
-			valence: [1,
+			valence: [ 1,
 				3
 			]
 		},
 		Hg: {
 			atomic: 80,
-			valence: [1,
+			valence: [ 1,
 				2
 			]
 		},
 		Ba: {
 			atomic: 56,
-			valence: [2]
+			valence: [ 2 ]
 		},
 		Zn: {
 			atomic: 30,
-			valence: [2]
+			valence: [ 2 ]
 		},
 		Mn: {
 			atomic: 25,
-			valence: [4,
+			valence: [ 4,
 				6,
 				7
 			]
 		},
 		Cr: {
 			atomic: 24,
-			valence: [3]
+			valence: [ 3 ]
 		},
 		Pb: {
 			atomic: 82,
-			valence: [2]
+			valence: [ 2 ]
 		},
 		Pt: {
 			atomic: 78,
-			valence: [2,
+			valence: [ 2,
 				4
 			]
 		},
 		Sn: {
 			atomic: 50,
-			valence: [2,
+			valence: [ 2,
 				4
 			]
 		},
 		U: {
 			atomic: 92,
-			valence: [4,
+			valence: [ 4,
 				6
 			]
 		},
 		Si: {
 			atomic: 14,
-			valence: [4]
+			valence: [ 4 ]
 		},
 		I: {
 			atomic: 53,
-			valence: [-1]
+			valence: [ -1 ]
 		},
 		Xe: {
 			atomic: 54,
-			valence: [NaN]
+			valence: [ NaN ]
 		},
 		"OH": {
 			atomic: 9,
-			valence: [-1],
+			valence: [ -1 ],
 		},
 		"CO<sub>3</sub>": {
 			atomic: 30,
-			valence: [-2],
+			valence: [ -2 ],
 		},
 		"SO<sub>4</sub>": {
 			atomic: 48,
-			valence: [-2],
+			valence: [ -2 ],
 		},
 		"NO<sub>3</sub>": {
 			atomic: 31,
-			valence: [-1],
+			valence: [ -1 ],
 		},
 		"NH<sub>4</sub>": {
 			atomic: 11,
-			valence: [1],
+			valence: [ 1 ],
 		},
 	},
 	env: {
@@ -253,7 +253,7 @@ const chemist = {
 			effect: {
 				exo: 1.3,
 				end: 0.8,
-				suc: [10,
+				suc: [ 10,
 					-20
 				]
 			},
@@ -266,7 +266,7 @@ const chemist = {
 			effect: {
 				exo: 0.8,
 				end: 1.3,
-				suc: [-20,
+				suc: [ -20,
 					10
 				]
 			},
@@ -279,7 +279,7 @@ const chemist = {
 			effect: {
 				exo: 0.9,
 				end: 1.05,
-				suc: [-10,
+				suc: [ -10,
 					5
 				],
 			},
@@ -292,7 +292,7 @@ const chemist = {
 			effect: {
 				exo: 1.1,
 				end: 1.2,
-				suc: [20,
+				suc: [ 20,
 					20
 				]
 			},
@@ -305,7 +305,7 @@ const chemist = {
 			effect: {
 				exo: 1,
 				end: 1,
-				suc: [-20,
+				suc: [ -20,
 					-20
 				]
 			},
@@ -318,7 +318,7 @@ const chemist = {
 			effect: {
 				exo: 1.5,
 				end: 1.5,
-				suc: [-50,
+				suc: [ -50,
 					-50
 				]
 			},
@@ -360,7 +360,7 @@ const chemist = {
 		F: "F<sub>2</sub>",
 		OH: "H<sub>2</sub>O<sub>2</sub>",
 	},
-	x: [{
+	x: [ {
 			"f": {
 				"H<sub>2</sub>": 2,
 				"O<sub>2</sub>": 1
@@ -697,9 +697,6 @@ const chemist = {
 			},
 			"y": 222
 		},
-
-
-
 
 		{
 			"f": {
@@ -1878,16 +1875,6 @@ const chemist = {
 		},
 		{
 			"f": {
-				"CuSO<sub>4</sub>·5H<sub>2</sub>O": 1
-			},
-			"t": {
-				"CuSO<sub>4</sub>": 1,
-				"H<sub>2</sub>O": 5
-			},
-			"y": 180 // 160+90=250 → 五水硫酸铜脱水吸热
-		},
-		{
-			"f": {
 				"CaC<sub>2</sub>": 1,
 				"H<sub>2</sub>O": 2
 			},
@@ -2270,6 +2257,7 @@ const chemist = {
 			"y": 115414,
 		},
 	],
+	mk: new Set(),
 }
 var prop = {
 	H: 0.0816,
@@ -2320,7 +2308,7 @@ const smsg = {
 	hkx: "由于水的比热容较大，且是最出名的溶剂，它也许可以减小一些反应的威力？",
 	psf: "众所周知，被铁锈划伤要打破伤风疫苗，它也许可以增大一些反应的威力？",
 	dj: "钱生钱，利滚利，有钱有什么不好的？有钱人总能吸引更多资源，比如元素力？",
-	fz: "“将大局逆转吧！”<br />这玩意反应了还挺热乎的，它也许可以把你降下来的熵又升回去？",
+	fz: "“将大局逆转吧！”<br />这玩意反应了还挺热乎的，它也许可以把你的负熵变成正熵？",
 };
 const colors = {
 	H: "#E8F8FF",
@@ -2395,7 +2383,7 @@ const colors = {
 };
 const ADVEN = {
 	terrain: [
-		[{
+		[ {
 				x: 0.1,
 				y: 0.6,
 				width: 5
@@ -2413,7 +2401,7 @@ const ADVEN = {
 				width: 10
 			} // 中央悬浮平台
 		],
-		[{
+		[ {
 				x: 1.5,
 				y: 0.4,
 				width: 5
@@ -2426,23 +2414,39 @@ const ADVEN = {
 			} // 中央悬浮平台
 		]
 	],
-	enemys: [{
+	enemys: [ {
 		name: "F",
-		hp: [1, 5],
+		hp: [ 1, 5 ],
 		skills: [],
 		odds: 0.5
 	}, {
 		name: "Ar",
-		hp: [5, 15],
+		hp: [ 5, 15 ],
 		skills: [],
 		odds: 0.05,
 		attack: {
-			interval: 3000,  // 攻击间隔
-			speed: 900,      // 粒子速度
-			count: 3         // 每次发射数量
+			interval: 3000, // 攻击间隔
+			speed: 900, // 粒子速度
+			count: 3 // 每次发射数量
 		}
-	}],
+	} ],
 }
+window.dicpreloader = new Promise( ( res ) => {
+	//chemist.mk.add( ...Object.values( chemist.sub ) );
+	let i = 0;
+	let cx = setInterval( () => {
+		if ( i < chemist.x.length ) {
+			chemist.mk.add( ...Object.keys( chemist.x[ i ].f ) );
+			chemist.mk.add( ...Object.keys( chemist.x[ i ].t ) );
+			i++;
+		} else {
+			clearInterval( cx );
+			chemist.mk = Array.from( chemist.mk );
+			res();
+		}
+	} );
+} );
 
-const GAME_HEIGHT = 450;
-const GAME_WIDTH = GAME_HEIGHT * innerWidth / innerHeight;
+const GAME_HEIGHT = 240;
+const GAME_FACTOR = GAME_HEIGHT / 450;
+const GAME_WIDTH = Math.round( GAME_HEIGHT * innerWidth / innerHeight );

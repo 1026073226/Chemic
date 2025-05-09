@@ -347,6 +347,42 @@ input[type="range"] {
 	will-change: height;
 }
 
+#waiter {
+	padding: 1.5px;
+	width: 100%;
+	height: 30px;
+	z-index: 0;
+	overflow-x: auto;
+	overflow-y: hidden;
+	white-space: nowrap;
+	scroll-behavior: smooth;
+	opacity: 0.8;
+	background-color: #888;
+	border-radius: 5px;
+	box-shadow: 0 0 5px #DDD;
+	position: fixed;
+	bottom: 120px;
+	transition: bottom 384ms;
+	will-change: bottom;
+}
+
+#waiter .waiters {
+	height: 30px;
+	font-size: 15px;
+	line-height: 30px;
+	width: 10ch;
+	overflow-x: auto;
+	overflow-y: hidden;
+	margin-left: 2px;
+	margin-right: 2px;
+	background-color: #666;
+	color: #FFF;
+	box-shadow: inset 0 0 5px #888;
+	text-align: center;
+	border-radius: 5px;
+	display: inline-block;
+}
+
 .hand {
 	white-space: nowrap;
 	overflow-x: hidden;
@@ -763,14 +799,14 @@ input:hover,
 	transition: background-color 0.2s;
 }
 
-#troll:hover, #troll:active {
+#troll:hover,
+#troll:active {
 	background-color: rgba(255, 255, 255, 0.2);
 	opacity: 0.8;
 }
 
 #showEle {
-	will-change: transform;
-	backface-visibility: hidden;
+	will-change: transform opacity;
 }
 
 #env button {
@@ -964,16 +1000,16 @@ iframe {
 	left: 0;
 	overflow: hidden;
 	background-color: #FFF;
-	transition: opacity 452ms;
-
+	transition: opacity 452ms, background-color 452ms;
+	will-change: opacity background-color;
 }
 
 #loadPic img {
 	object-fit: contain;
-	height: 90%;
+	height: 60%;
 	width: 100%;
 	position: fixed;
-	top: 0;
+	top: 10%;
 	left: 0;
 	z-index: 10000;
 	opacity: 0;
@@ -989,7 +1025,7 @@ iframe {
 	width: 100%;
 	white-space: nowrap;
 	line-height: 1.5em;
-	color: #EEE;
+	color: #DDD;
 	opacity: 0;
 }
 
@@ -1134,7 +1170,10 @@ iframe {
 	z-index: 8;
 	transition: width 386ms;
 	will-change: width;
+	color: #FFF;
+	text-shadow: 0 0 5px #FFF;
 }
+
 .task-dropdown {
 	opacity: 0.8;
 	background-color: #444;
@@ -1142,7 +1181,7 @@ iframe {
 	padding: 5px;
 	z-index: 9;
 	width: auto;
-	max-height: 4em;
+	max-height: 3em;
 	overflow: auto;
 	box-sizing: border-box;
 	height: 0;
@@ -1150,10 +1189,12 @@ iframe {
 	transition: height 386ms, opacity 386ms;
 	will-change: height, opacity;
 }
+
 .task-item {
 	padding: 3px;
-	border-bottom: 1px solid rgba(255,255,255,0.1);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .task-item:last-child {
 	border-bottom: none;
 }

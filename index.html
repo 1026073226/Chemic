@@ -27,7 +27,8 @@
 			<div class="task-list" @click="(taskListOpen = !taskListOpen)">
 				当前任务: <span v-html="quests.length > 0 ? quests[0].f : '无'"></span>
 				<span v-if="quests.length > 0">{{quests[0].t}}元素力</span>
-				<div class="task-dropdown" :style="'height:' + (taskListOpen ? '4em' : '0') + ';opacity:' + (taskListOpen ? '0.8' : '0')">
+				<div class="task-dropdown"
+					:style="'height:' + (taskListOpen ? quests.length * 2 + 'em' : '0') + ';opacity:' + (taskListOpen ? '0.8' : '0')">
 					<div v-for="(quest, index) in quests" :key="index" class="task-item">
 						<span v-html="quest.f"></span>
 						<span>{{quest.t}}元素力</span>
@@ -435,7 +436,8 @@
 					</div>
 					<hr />
 					<span class="n">版本</span>
-					<span class="setInp n" onclick="open('https://github.com/1026073226/Chemic/releases')">{{version}}&nbsp;</span>
+					<span class="setInp n"
+						onclick="open('https://github.com/1026073226/Chemic/releases')">{{version}}&nbsp;</span>
 					<hr />
 					<button @click="reset" class="fullBtn">重新开始</button>
 					<hr />
@@ -470,8 +472,11 @@
 				</div>
 			</div>
 			<div id="bgi" :style="settings.am ? 'transform: rotate(180deg);opacity: 0.1' : ''"></div>
+			<div id="waiter" :style="'bottom:' + ((openBottomline ? bottomlineHeight : 7) + 3) + 'px;'">
+				<span class="waiters" v-for="item in proMk" v-html="item.mk" @click="altAdd(item)"></span>
+			</div>
 			<div id="bottomline" :style="'height: ' + (openBottomline ? bottomlineHeight : 7) + 'px'">
-				<div id="troll" @click="hidb">—</div>
+				<div id="troll">—</div>
 				<div class="hand" v-if="!settings.ap">
 					<div class="brand" v-for="(item, index) in brand" @click="add(item, index, $event)"
 						:style="'width: calc( ' + settings.bw + '% - 7.5px );'">
@@ -496,12 +501,12 @@
 				<iframe src="readme.html"></iframe>
 			</div>
 			<div id="loadPic">
-				<img src="img/splash.png" />
+				<img src="icon.png" />
 				<div class="htp"
 					:style="'width:calc(' + loaded + '% - 10px);background-color:rgb(198, 255,' + ( loaded * 1.28 + 127 ) + ')'"
 					id="loadTp">
 				</div>
-				<span class="a" id="getIn" style="color:#DDD">点击进入游戏</span>
+				<span class="a" id="getIn">点击进入游戏</span>
 			</div>
 			<div id="impeh" :style="'pointer-events:' + (imped ? 'all' : 'none')" @click="!playing && impe()"></div>
 		</div>

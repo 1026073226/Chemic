@@ -22,7 +22,8 @@
 				<p style="padding-left: 10vw; color: #FFF;">画面质量</p>
 				<input style="margin-left: 5vw; width: 85vw" type="range" min="0" max="1" step="0.01" id="qrange"
 					oninput="QUALITY = Number(this.value); document.getElementById('quality').innerText = QUALITY; localStorage.QUALITY = QUALITY" />
-				<span id="quality" class="a" style="background-color: #AAA; color: #FFF; border-radius: 2px; width: 5vw; text-align: center; display: inline-block">1</span>
+				<span id="quality" class="a"
+					style="background-color: #AAA; color: #FFF; border-radius: 2px; width: 5vw; text-align: center; display: inline-block">1</span>
 				<br />
 				<button class="btn" id="jam-out">脱离卡死</button>
 				<button class="btn" id="quit-game">终止实验</button>
@@ -44,11 +45,11 @@
 			<div class="character-grid"></div>
 		</div>
 		<div id="game-container"></div>
-		<div id="loadPic" style="pointer-events: none">
-			<img src="img/splash.png" />
+		<div id="loadPic" style="pointer-events: none; background-color: rgb(126, 83, 57);">
+			<img src="icon.png" />
 			<div class="htp" id="loadTp">
 			</div>
-			<span class="a" id="getIn" style="font-size: 100%">点击进入游戏</span>
+			<span class="a" id="getIn">点击进入游戏</span>
 		</div>
 		<script src="js/public/phaser.min.js"></script>
 		<script src="js/adven/joystick.js"></script>
