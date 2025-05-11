@@ -251,6 +251,10 @@ input[type="range"] {
 	padding: 0;
 	margin: 0;
 	z-index: 5;
+	height: 120px;
+	position: fixed;
+	bottom: 0;
+	z-index: 5;
 }
 
 #ballm canvas {
@@ -351,13 +355,13 @@ input[type="range"] {
 	padding: 1.5px;
 	width: 100%;
 	height: 30px;
-	z-index: 0;
+	z-index: 2;
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
 	scroll-behavior: smooth;
 	opacity: 0.8;
-	background-color: #888;
+	background-color: rgba(168, 168, 168, 0.6);
 	border-radius: 5px;
 	box-shadow: 0 0 5px #DDD;
 	position: fixed;
@@ -1159,12 +1163,11 @@ iframe {
 }
 
 .task-list {
-	cursor: pointer;
 	position: fixed;
 	right: 0;
 	bottom: 70%;
 	opacity: 0.8;
-	background-color: #888;
+	background-color: rgba(168, 168, 168, 0.4);
 	border-radius: 5px;
 	padding: 5px;
 	z-index: 8;

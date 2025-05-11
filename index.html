@@ -24,7 +24,7 @@
 				{{ (settings.sf ? (force + "/" + fcost) : "") }}&nbsp;
 				{{ settings.senv ? env.now.icon : "" }}&nbsp;
 			</div>
-			<div class="task-list" @click="(taskListOpen = !taskListOpen)">
+			<div class="task-list" @click="changeTaskList">
 				当前任务: <span v-html="quests.length > 0 ? quests[0].f : '无'"></span>
 				<span v-if="quests.length > 0">{{quests[0].t}}元素力</span>
 				<div class="task-dropdown"
@@ -43,7 +43,8 @@
 				<button @click="change('shop', !shop)">💰</button>
 				<button @click="change('draw', !draw)" v-show="connectType !== 1">🌠</button>
 			</div>
-			<div id="ballm" v-show="ballm"></div>
+			<div id="ballm" v-show="ballm" :style="'height:' + bottomlineHeight + 'px'">
+			</div>
 			<div id="draw" v-show="draw">
 				<div
 					style="background-color: rgba(14, 14, 14, 0.1);border-radius: 5px; padding-bottom: 1em; width: calc(100% - 10px); margin-left: 5px">

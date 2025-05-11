@@ -1,400 +1,424 @@
 class BallScene extends Phaser.Scene {
-	constructor() {
-		super( {
-			key: 'BallScene'
-		} );
-		this.balls = []; // 存储所有小球
-		this.dividerX = 0; // 分隔线x坐标
-		this.draggingBall = null; // 当前正在拖动的小球
-		this.dragConstraint = null; // 拖动约束
-		this.selectedFuncBall = null; // 当前选中的功能球
-		this.glowFX = null; // 发光效果
-		this.maxBallsWidth = 0;
-		this.lastBrand = null;
-	}
+  constructor() {
+    super( {
+      key: 'BallScene'
+    });
+    this.balls = []; // 存储所有小球
+    this.dividerX = 0; // 分隔线x坐标
+    this.draggingBall = null; // 当前正在拖动的小球
+    this.dragConstraint = null; // 拖动约束
+    this.selectedFuncBall = null; // 当前选中的功能球
+    this.glowFX = null; // 发光效果
+    this.maxBallsWidth = 0;
+    this.lastBrand = null;
+  }
 
-	preload() {
-		// 预加载资源
-	}
+  preload() {
+    // 预加载资源
+  }
 
-	create() {
-		window.$this = this;
-		const width = this.scale.width;
-		const height = this.scale.height;
+  create() {
+    window.$this = this;
+    const width = this.scale.width;
+    const height = this.scale.height;
 
-		// 计算分隔线位置（左侧占80%）
-		this.dividerX = width * 0.8;
+    // 计算分隔线位置（左侧占80%）
+    this.dividerX = width * 0.8;
 
-		// 创建分隔线（视觉）
-		const graphics = this.add.graphics();
-		graphics.lineStyle( 8, 0xFFFFFF, 0.5 );
-		graphics.lineBetween( this.dividerX, 0, this.dividerX, height );
-		graphics.setDepth( 1 );
+    // 创建分隔线（视觉）
+    const graphics = this.add.graphics();
+    graphics.lineStyle(8, 0xFFFFFF, 0.5);
+    graphics.lineBetween(this.dividerX, 0, this.dividerX, height);
+    graphics.setDepth(1);
 
-		// 创建物理墙
-		const wall = this.matter.add.rectangle( this.dividerX, height / 2, 8, height, {
-			isStatic: true,
-			restitution: 0.8,
-			friction: 0.1,
-			chamfer: {
-				radius: 4
-			}
-		} );
+    // 创建物理墙
+    this.wall = this.matter.add.rectangle(this.dividerX, height / 2, 8, height, {
+      isStatic: true,
+      restitution: 0.8,
+      friction: 0.1,
+      chamfer: {
+        radius: 4
+      }
+    });
 
-		// 创建发光效果
-		this.glowFX = {
-			distance: 15,
-			outerStrength: 2,
-			innerStrength: 1,
-			color: 0xffffff,
-			quality: 0.1,
-		};
+    // 创建发光效果
+    this.glowFX = {
+      distance: 15,
+      outerStrength: 2,
+      innerStrength: 1,
+      color: 0xffffff,
+      quality: 0.1,
+    };
 
-		// 创建 Matter.js 物理引擎，设置完整边界
-		this.matter.world.setBounds( 0, 0, width, height );
+    // 创建 Matter.js 物理引擎，设置完整边界
+    this.matter.world.setBounds(0, 0, width, height);
 
-		// 监听 Vue 实例的变化
-		app.balls = {
-			update: () => this.updateBalls()
-		};
+    // 监听 Vue 实例的变化
+    app.balls = {
+      update: () => this.updateBalls(),
+      resize: () => {
+        if (app.bottomlineHeight == this.scale.height || !this.wall) return;
+        const width = this.scale.width;
+        const height = Math.round(app.bottomlineHeight);
+        this.scale.resize(width, height);
+        this.matter.world.setBounds(0, 0, width, height);
 
-		// 添加点击事件
-		this.input.on( 'pointerdown', this.handleBalls, this );
+        graphics.lineBetween(this.dividerX, 0, this.dividerX, height);
 
-		this.input.on( 'pointermove', ( pointer ) => {
-			if ( this.draggingBall && this.dragConstraint ) {
-				// 更新约束点的位置
-				this.dragConstraint.pointA = {
-					x: pointer.x,
-					y: pointer.y
-				};
-			}
-		} );
+        if (this.wall) {
+          this.wall;
+        }
+        this.wall = this.matter.add.rectangle(
+          this.dividerX,
+          height / 2,
+          8,
+          height,
+          {
+            isStatic: true,
+            restitution: 0.8,
+            friction: 0.1
+          }
+        );
+      }
+    };
 
-		this.input.on( 'pointerup', () => {
-			if ( this.draggingBall && this.dragConstraint ) {
-				// 移除拖动约束
-				this.matter.world.removeConstraint( this.dragConstraint );
-				if ( this.draggingBall.body.position.x > this.dividerX ) {
-					this.useBall( this.draggingBall );
-				}
-				this.dragConstraint = null;
-				this.draggingBall = null;
-			}
-		} );
-	}
+    // 添加点击事件
+    this.input.on('pointerdown', this.handleBalls, this);
 
-	handleBalls( pointer ) {
-		const clickX = pointer.x;
-		const clickY = pointer.y;
-		let canFunc = true;
+    this.input.on('pointermove', (pointer) => {
+      if (this.draggingBall && this.dragConstraint) {
+        // 更新约束点的位置
+        this.dragConstraint.pointA = {
+          x: pointer.x,
+          y: pointer.y
+        };
+      }
+    });
 
-		// 遍历所有小球
-		this.matter.world.localWorld.bodies.forEach( ( body ) => {
-			if ( body.gameObject ) {
-				// 计算点击位置到小球的方向向量
-				const dx = body.position.x - clickX;
-				const dy = body.position.y - clickY;
-				const distance = Math.sqrt( dx * dx + dy * dy );
-				const radius = body.gameObject.realRadius || body.gameObject.radius || 20;
-				// 如果直接点击到小球
-				if ( distance <= radius ) {
-					const ballText = body.gameObject.btext;
+    this.input.on('pointerup',
+      () => {
+        if (this.draggingBall && this.dragConstraint) {
+          // 移除拖动约束
+          this.matter.world.removeConstraint(this.dragConstraint);
+          if (this.draggingBall.body.position.x > this.dividerX) {
+            this.useBall(this.draggingBall);
+          }
+          this.dragConstraint = null;
+          this.draggingBall = null;
+        }
+      });
 
-					// 如果已经选中了功能球，且点击的是其他球
-					if ( this.selectedFuncBall && this.selectedFuncBall !== body.gameObject &&
-						canFunc ) {
-						// 确保目标不是功能球
-						if ( !ballText.match( /^\+\d$/ ) ) {
-							const multiplier = parseInt( this.selectedFuncBall.label.node.innerHTML
-								.replace( '+', '' ) );
+  }
 
-							// 在目标位置创建多个元素球
-							for ( let i = 0; i < multiplier; i++ ) {
-								const offsetX = Phaser.Math.Between( -20, 20 );
-								const offsetY = Phaser.Math.Between( -20, 20 );
-								this.createBallWithText(
-									body.position.x + offsetX,
-									body.position.y + offsetY,
-									ballText
-								);
-								app.brand.push( ballText );
-							}
+  handleBalls(pointer) {
+    const clickX = pointer.x;
+    const clickY = pointer.y;
+    let canFunc = true;
 
-							// 移除功能球
-							app.brand.splice( app.brand.indexOf( this.selectedFuncBall.btext ), 1 );
-							this.matter.world.remove( this.selectedFuncBall.body );
-							this.selectedFuncBall.label.destroy();
-							this.selectedFuncBall.destroy();
+    // 遍历所有小球
+    this.matter.world.localWorld.bodies.forEach((body) => {
+      if (body.gameObject) {
+        // 计算点击位置到小球的方向向量
+        const dx = body.position.x - clickX;
+        const dy = body.position.y - clickY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const radius = body.gameObject.realRadius || body.gameObject.radius || 10;
+        // 如果直接点击到小球
+        if (distance <= radius) {
+          const ballText = body.gameObject.btext;
 
-							// 播放音效
-							app.playSound( "cilllllll", false );
+          // 如果已经选中了功能球，且点击的是其他球
+          if (this.selectedFuncBall && this.selectedFuncBall !== body.gameObject &&
+            canFunc) {
+            // 确保目标不是功能球
+            if (!ballText.match(/^\+\d$/)) {
+              const multiplier = parseInt(this.selectedFuncBall.label.node.innerHTML
+                .replace('+', ''));
 
-							// 重置选中状态
-							this.selectedFuncBall = null;
-							return;
-						}
-					}
+              // 在目标位置创建多个元素球
+              for (let i = 0; i < multiplier; i++) {
+                const offsetX = Phaser.Math.Between(-20, 20);
+                const offsetY = Phaser.Math.Between(-20, 20);
+                this.createBallWithText(
+                  body.position.x + offsetX,
+                  body.position.y + offsetY,
+                  ballText
+                );
+                app.brand.push(ballText);
+              }
 
-					// 点击功能球时
-					if ( ballText.match( /^\+\d$/ ) ) {
-						if ( this.selectedFuncBall ) {
-							// 取消之前选中的功能球的发光效果
-							this.selectedFuncBall.postFX.clear();
-							if ( this.selectedFuncBall === body.gameObject ) {
-								this.selectedFuncBall = null;
-								return;
-							}
-						}
-						// 设置新的选中状态
-						this.selectedFuncBall = body.gameObject;
-						// 添加发光效果
-						const fx = this.selectedFuncBall.postFX.addGlow(
-							this.glowFX.color,
-							this.glowFX.outerStrength,
-							this.glowFX.innerStrength,
-							this.glowFX.distance,
-							this.glowFX.quality
-						);
-						// 添加呼吸效果
-						this.tweens.add( {
-							targets: fx,
-							outerStrength: 4,
-							innerStrength: 2,
-							yoyo: true,
-							repeat: -1,
-							duration: 1000,
-							ease: 'Sine.easeInOut'
-						} );
-						canFunc = false;
-					}
+              // 移除功能球
+              app.brand.splice(app.brand.indexOf(this.selectedFuncBall.btext), 1);
+              this.matter.world.remove(this.selectedFuncBall.body);
+              this.selectedFuncBall.label.destroy();
+              this.selectedFuncBall.destroy();
 
-					// 如果是普通拖动
-					this.draggingBall = body.gameObject;
-					this.dragConstraint = this.matter.add.pointerConstraint( {
-						pointA: {
-							x: clickX,
-							y: clickY
-						},
-						body: body,
-						stiffness: 0.015,
-						damping: 0.005 * this.draggingBall.radius,
-					} );
-				}
-				// 如果在小球周围，则施加推动力
-				else if ( distance < 300 ) {
-					// 计算力的方向和大小（距离越近力越大）
-					const forceMagnitude = ( 300 - distance ) * 0.0005;
-					const forceX = ( dx / distance ) * forceMagnitude;
-					const forceY = ( dy / distance ) * forceMagnitude;
+              // 播放音效
+              app.playSound("cilllllll", false);
 
-					// 施加力
-					body.gameObject.applyForce( {
-						x: forceX,
-						y: forceY
-					} );
-				}
-			}
-		} );
-	}
+              // 重置选中状态
+              this.selectedFuncBall = null;
+              return;
+            }
+          }
 
-	useBall( ball ) {
-		if ( app.add( ball.btext ) ) this.destroyBall( ball );
-	}
+          // 点击功能球时
+          if (ballText.match(/^\+\d$/)) {
+            if (this.selectedFuncBall) {
+              // 取消之前选中的功能球的发光效果
+              this.selectedFuncBall.postFX.clear();
+              if (this.selectedFuncBall === body.gameObject) {
+                this.selectedFuncBall = null;
+                return;
+              }
+            }
+            // 设置新的选中状态
+            this.selectedFuncBall = body.gameObject;
+            // 添加发光效果
+            const fx = this.selectedFuncBall.postFX.addGlow(
+              this.glowFX.color,
+              this.glowFX.outerStrength,
+              this.glowFX.innerStrength,
+              this.glowFX.distance,
+              this.glowFX.quality
+            );
+            // 添加呼吸效果
+            this.tweens.add( {
+              targets: fx,
+              outerStrength: 4,
+              innerStrength: 2,
+              yoyo: true,
+              repeat: -1,
+              duration: 1000,
+              ease: 'Sine.easeInOut'
+            });
+            canFunc = false;
+          }
 
-	destroyBall( ball ) {
-		if ( ball.label ) {
-			ball.label.destroy();
-			ball.label = null;
-		}
-		if ( ball.body ) {
-			this.matter.world.remove( ball.body );
-			ball.body = null;
-		}
-		if ( ball.destroy ) {
-			ball.destroy();
-		}
-	}
+          // 如果是普通拖动
+          this.draggingBall = body.gameObject;
+          this.dragConstraint = this.matter.add.pointerConstraint( {
+            pointA: {
+              x: clickX,
+              y: clickY
+            },
+            body: body,
+            stiffness: 0.015,
+            damping: 0.005 * this.draggingBall.radius,
+          });
+        }
+        // 如果在小球周围，则施加推动力
+        else if (distance < 300) {
+          // 计算力的方向和大小（距离越近力越大）
+          const forceMagnitude = (300 - distance) * 0.0005;
+          const forceX = (dx / distance) * forceMagnitude;
+          const forceY = (dy / distance) * forceMagnitude;
 
-	calculateBallPosition( i, gridSize, cellWidth, cellHeight ) {
-		// 计算网格位置
-		const row = Math.floor( i / gridSize );
-		const col = i % gridSize;
+          // 施加力
+          body.gameObject.applyForce( {
+            x: forceX,
+            y: forceY
+          });
+        }
+      }
+    });
+  }
 
-		// 在网格位置周围添加随机偏移，确保在左侧区域内
-		const x = ( col + 1 ) * cellWidth + Phaser.Math.Between( -cellWidth / 3, cellWidth / 3 );
-		const y = ( row + 1 ) * cellHeight + Phaser.Math.Between( -cellHeight / 3, cellHeight / 3 );
+  useBall(ball) {
+    if (app.add(ball.btext)) this.destroyBall(ball);
+  }
 
-		// 确保x坐标不超过分隔线
-		const finalX = Math.min( x, this.dividerX - 20 ); // 留出一些边距
-		return {
-			x: finalX,
-			y: y,
-		}
-	}
+  destroyBall(ball) {
+    if (ball.label) {
+      ball.label.destroy();
+      ball.label = null;
+    }
+    if (ball.body) {
+      this.matter.world.remove(ball.body);
+      ball.body = null;
+    }
+    if (ball.destroy) {
+      ball.destroy();
+    }
+  }
 
-	updateBalls() {
-		if ( JSON.stringify( app.brand ) === this.lastBrand ) {
-			return;
-		}
-		this.lastBrand = JSON.stringify( app.brand );
-		// 完全清理所有现有小球
-		this.balls.forEach( ball => {
-			this.destroyBall( ball );
-		} );
-		this.balls = [];
-		this.maxBallsWidth = 0;
+  calculateBallPosition(i, gridSize, cellWidth, cellHeight) {
+    // 计算网格位置
+    const row = Math.floor(i / gridSize);
+    const col = i % gridSize;
 
-		// 创建网格布局（只在左侧80%区域）
-		const gridSize = Math.ceil( Math.sqrt( app.brand.length ) );
-		const cellWidth = this.dividerX / ( gridSize + 1 );
-		const cellHeight = this.scale.height / ( gridSize + 1 );
+    // 在网格位置周围添加随机偏移，确保在左侧区域内
+    const x = (col + 1) * cellWidth + Phaser.Math.Between(-cellWidth / 3, cellWidth / 3);
+    const y = (row + 1) * cellHeight + Phaser.Math.Between(-cellHeight / 3, cellHeight / 3);
 
-		// 根据brand创建新的小球
-		for ( let i = 0; i < app.brand.length; i++ ) {
-			const {
-				x,
-				y
-			} = this.calculateBallPosition( i, gridSize, cellWidth, cellHeight );
-			this.createBallWithText( x, y, app.brand[ i ] );
+    // 确保x坐标不超过分隔线
+    const finalX = Math.min(x, this.dividerX - 20); // 留出一些边距
+    return {
+      x: finalX,
+      y: y,
+    }
+  }
 
-		}
+  updateBalls() {
+    if (JSON.stringify(app.brand) === this.lastBrand) {
+      return;
+    }
+    this.lastBrand = JSON.stringify(app.brand);
+    // 完全清理所有现有小球
+    this.balls.forEach(ball => {
+      this.destroyBall(ball);
+    });
+    this.balls = [];
+    this.maxBallsWidth = 0;
 
-		//调整至合适的大小
-		if ( this.maxBallsWidth > this.dividerX ) {
-			this.balls.map( ball => {
-				let size = Math.pow( this.dividerX / this.maxBallsWidth, 0.4 );
-				ball.setScale( size );
-				ball.label.setScale( size );
-				ball.realRadius = ball.radius * size;
-			} );
-		}
-	}
+    // 创建网格布局（只在左侧80%区域）
+    const gridSize = Math.ceil(Math.sqrt(app.brand.length));
+    const cellWidth = this.dividerX / (gridSize + 1);
+    const cellHeight = this.scale.height / (gridSize + 1);
 
-	createBallWithText( x, y, text ) {
-		// 根据原子序数计算半径，使用对数函数使大小差距更小
-		const atomic = chemist.elements[ text ]?.atomic || 0.1 / prop[ text ] || 1;
-		const radius = Math.floor( 20 + Math.log2( atomic ) * 5 ); // 基础大小20，每增加一倍原子序数增加5像素
-		let color = colors[ text ] || "#DDDDDD";
-		color = Phaser.Display.Color.HexStringToColor( color ).color;
-		this.maxBallsWidth += radius;
-		// 创建圆形物理体
-		const ball = this.matter.add.gameObject(
-			this.add.circle( x, y, radius, color ), {
-				shape: 'circle',
-				restitution: 0.9, // 保持一定弹性
-				friction: 0.01, // 保留少量摩擦力
-				frictionAir: 0.01, // 保留少量空气阻力
-				density: Math.log2( radius ) * 0.001, // 密度与半径成正比
-				chamfer: {
-					radius: 5
-				},
-				collisionFilter: {
-					group: 0,
-					category: 0x0001,
-					mask: 0xFFFFFFFF
-				}
-			}
-		);
+    // 根据brand创建新的小球
+    for (let i = 0; i < app.brand.length; i++) {
+      const {
+        x,
+        y
+      } = this.calculateBallPosition(i, gridSize, cellWidth, cellHeight);
+      this.createBallWithText(x, y, app.brand[i]);
 
-		// 设置更小的随机初始速度和更随机的角度
-		const angle = Phaser.Math.Between( 0, 360 );
-		const speed = Phaser.Math.Between( 3, 6 ); // 增加初始速度
+    }
 
-		// 将角度转换为弧度并计算x和y方向的速度分量
-		const angleInRadians = Phaser.Math.DegToRad( angle );
-		const velocityX = Math.cos( angleInRadians ) * speed;
-		const velocityY = Math.sin( angleInRadians ) * speed;
+    //调整至合适的大小
+    if (this.maxBallsWidth > this.dividerX) {
+      this.balls.map(ball => {
+        let size = Math.pow(this.dividerX / this.maxBallsWidth, 0.8);
+        ball.setScale(size);
+        ball.label.setScale(size);
+        ball.realRadius = ball.radius * size;
+      });
+    }
+  }
 
-		// 设置速度
-		ball.setVelocity( velocityX, velocityY );
+  createBallWithText(x, y, text) {
+    // 根据原子序数计算半径，使用对数函数使大小差距更小
+    const atomic = chemist.elements[text]?.atomic || 0.1 / prop[text] || 1;
+    const radius = Math.floor(10 + Math.log2(atomic) * 5); // 基础大小20，每增加一倍原子序数增加5像素
+    let color = colors[text] || "#DDDDDD";
+    color = Phaser.Display.Color.HexStringToColor(color).color;
+    this.maxBallsWidth += radius;
+    // 创建圆形物理体
+    const ball = this.matter.add.gameObject(
+      this.add.circle(x, y, radius, color), {
+        shape: 'circle',
+        restitution: 0.9, // 保持一定弹性
+        friction: 0.01, // 保留少量摩擦力
+        frictionAir: 0.01, // 保留少量空气阻力
+        density: Math.log2(radius) * 0.001, // 密度与半径成正比
+        chamfer: {
+          radius: 5
+        },
+        collisionFilter: {
+          group: 0,
+          category: 0x0001,
+          mask: 0xFFFFFFFF
+        }
+      }
+    );
 
-		// 创建文字
-		const label = this.add.dom( x, y, 'div', {
-			'font-size': Math.min( radius, 30 ) + 'px',
-			'color': '#555555',
-			'line-height': '1',
-			'vertical-align': 'middle',
-			'width': radius + 'px',
-			'height': radius + 'px',
-			'box-sizing': 'border-box',
-		}, text );
-		label.setDepth( 2 )
-			.setOrigin( 0 )
-			.disableInteractive();
+    // 设置更小的随机初始速度和更随机的角度
+    const angle = Phaser.Math.Between(0, 360);
+    const speed = Phaser.Math.Between(3, 6); // 增加初始速度
 
-		// 确保sub标签能被正确解析
-		label.node.innerHTML = text.replace( /<sub>/g, '<sub style="font-size: 0.7em; vertical-align: sub;">' );
-		label.node.className = 'ball-label';
+    // 将角度转换为弧度并计算x和y方向的速度分量
+    const angleInRadians = Phaser.Math.DegToRad(angle);
+    const velocityX = Math.cos(angleInRadians) * speed;
+    const velocityY = Math.sin(angleInRadians) * speed;
 
-		// 将文字绑定到物理体
-		ball.label = label;
+    // 设置速度
+    ball.setVelocity(velocityX, velocityY);
 
-		//将索引绑定到小球
-		ball.btext = text;
+    // 创建文字
+    const label = this.add.dom(x, y, 'div', {
+      'font-size': Math.min(radius, 30) + 'px',
+      'color': '#555555',
+      'line-height': '1',
+      'vertical-align': 'middle',
+      'width': radius + 'px',
+      'height': radius + 'px',
+      'box-sizing': 'border-box',
+    }, text);
+    label.setDepth(2)
+    .setOrigin(0)
+    .disableInteractive();
 
-		// 将实际大小绑定至小球
-		ball.realRadius = radius;
+    // 确保sub标签能被正确解析
+    label.node.innerHTML = text.replace(/<sub>/g, '<sub style="font-size: 0.7em; vertical-align: sub;">');
+    label.node.className = 'ball-label';
 
-		// 更新位置
-		this.matter.world.on( 'afterupdate', () => {
-			if ( label && label.active ) {
-				label.x = ball.x - ball.realRadius / 3;
-				label.y = ball.y;
-			}
-		} );
+    // 将文字绑定到物理体
+    ball.label = label;
 
-		// 存储小球引用
-		this.balls.push( ball );
-	}
+    //将索引绑定到小球
+    ball.btext = text;
 
-	update() {
-		// 更新逻辑
-	}
+    // 将实际大小绑定至小球
+    ball.realRadius = radius;
+
+    // 更新位置
+    this.matter.world.on('afterupdate', () => {
+      if (label && label.active) {
+        label.x = ball.x - ball.realRadius / 3;
+        label.y = ball.y;
+      }
+    });
+
+    // 存储小球引用
+    this.balls.push(ball);
+  }
+
+  update() {
+    // 更新逻辑
+  }
 }
 
 // 创建游戏配置
 const config = {
-	type: Phaser.AUTO,
-	width: GAME_WIDTH,
-	height: GAME_HEIGHT,
-	parent: 'ballm',
-	transparent: true,
-	backgroundColor: '#00000000',
-	scale: {
-		mode: Phaser.Scale.EXACT_FIT,
-		autoCenter: Phaser.Scale.CENTER_BOTH,
-		parent: 'ballm',
-		width: '100%',
-		height: '100%'
-	},
-	fps: {
-		target: 60,
-		min: 30
-	},
-	dom: {
-		createContainer: true,
-	},
-	render: {
-		antialias: true,
-		pixelArt: true,
-		roundPixels: false,
-	},
-	physics: {
-		default: 'matter',
-		matter: {
-			debug: false,
-			gravity: {
-				y: 0.01
-			}
-		}
-	},
-	input: {
-		touch: true,
-		mouse: true
-	},
-	scene: BallScene
-};
+  type: Phaser.AUTO,
+  width: Math.round(window.innerWidth),
+  height: 120,
+  parent: 'ballm',
+  transparent: true,
+  backgroundColor: '#00000000',
+  scale: {
+    mode: Phaser.Scale.EXACT_FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    parent: 'ballm',
+  },
+  fps: {
+    target: 60,
+    min: 30
+  },
+  dom: {
+    createContainer: true,
+  },
+  render: {
+    antialias: true,
+    pixelArt: true,
+    roundPixels: false,
+  },
+  physics: {
+    default: 'matter',
+      matter: {
+        debug: false,
+        gravity: {
+          y: 0.01
+        }
+      }
+    },
+    input: {
+      touch: true,
+      mouse: true
+    },
+    scene: BallScene
+  };
 
-// 创建游戏实例
-const game = new Phaser.Game( config );
+  // 创建游戏实例
+  const game = new Phaser.Game(config);
