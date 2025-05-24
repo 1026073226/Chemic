@@ -1141,7 +1141,7 @@ class MainGameScene extends Phaser.Scene {
 
 		//区块处理
 		const chunkIndex = ( this.player.x + this.scale.width / 2 ) / this.CHUNK_WIDTH;
-		if ( chunkIndex - this.chunkIndex > 0.4 ) {
+		if ( chunkIndex - this.chunkIndex > 0.8 ) {
 			this.chunkIndex = chunkIndex;
 			if ( Phaser.Math.Between( 0, 5 ) < 3 ) {
 				this.generatePlatform();
