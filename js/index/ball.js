@@ -4,7 +4,6 @@ class BallScene extends Phaser.Scene {
 			key: 'BallScene'
 		} );
 		this.balls = []; // 存储所有小球
-		this.dividerX = 0; // 分隔线x坐标
 		this.draggingBall = null; // 当前正在拖动的小球
 		this.dragConstraint = null; // 拖动约束
 		this.selectedFuncBall = null; // 当前选中的功能球
@@ -14,32 +13,16 @@ class BallScene extends Phaser.Scene {
 		this.sizeScale = 1;
 	}
 
-	preload() {
-		// 预加载资源
-	}
-
 	create() {
 		window.$this = this;
 		const width = this.scale.width;
 		const height = this.scale.height;
 
-		// 计算分隔线位置（左侧占80%）
-		this.dividerX = width * 0.8;
-
-		// 创建分隔线（视觉）
-		const graphics = this.add.graphics();
-		graphics.lineStyle( 8, 0xFFFFFF, 0.5 );
-		graphics.lineBetween( this.dividerX, 0, this.dividerX, height );
-		graphics.setDepth( 1 );
-
 		// 创建物理墙
-		this.wall = this.matter.add.rectangle( this.dividerX, height / 2, 8, height, {
+		this.wall = this.matter.add.rectangle( width / 2, 0, width, 5, {
 			isStatic: true,
-			restitution: 0.8,
+			restitution: 0.9,
 			friction: 0.1,
-			chamfer: {
-				radius: 4
-			}
 		} );
 
 		// 创建发光效果
@@ -51,8 +34,15 @@ class BallScene extends Phaser.Scene {
 			quality: 0.1,
 		};
 
-		// 创建 Matter.js 物理引擎，设置完整边界
-		this.matter.world.setBounds( 0, 0, width, height );
+    this.matter.world.setBounds(
+      0, 0,
+      width, height,  // 宽度、高度
+      32,             // 边界厚度（默认值）
+      true,           // 左边界（true = 创建）
+      true,           // 右边界（true = 创建）
+      false,          // 上边界（false = 不创建）
+      true            // 下边界（true = 创建）
+    );
 
 		// 监听 Vue 实例的变化
 		app.balls = {
@@ -64,18 +54,13 @@ class BallScene extends Phaser.Scene {
 				this.scale.resize( width, height );
 				this.matter.world.setBounds( 0, 0, width, height );
 
-				// 更新分隔线视觉效果
-				graphics.clear();
-				graphics.lineStyle( 8, 0xFFFFFF, 0.5 );
-				graphics.lineBetween( this.dividerX, 0, this.dividerX, height );
-
 				// 更新wall的位置和尺寸
-				Matter.Body.setPosition( this.wall, {
-					x: this.dividerX,
-					y: height / 2
+				this.matter.body.setPosition( this.wall, {
+					x: this.scale.width / 2,
+					y: 0
 				} );
 				const wallBounds = this.wall.bounds;
-				Matter.Body.scale( this.wall, 1, height / ( wallBounds.max.y - wallBounds.min.y ) );
+				this.matter.body.scale( this.wall, this.scale.width / (wallBounds.max.x - wallBounds.min.x), 1 );
 			}
 		};
 
@@ -97,7 +82,7 @@ class BallScene extends Phaser.Scene {
 				if ( this.draggingBall && this.dragConstraint ) {
 					// 移除拖动约束
 					this.matter.world.removeConstraint( this.dragConstraint );
-					if ( this.draggingBall.body.position.x > this.dividerX ) {
+					if ( this.draggingBall.body.position.y < 10 ) {
 						this.useBall( this.draggingBall );
 					}
 					this.dragConstraint = null;
@@ -200,7 +185,7 @@ class BallScene extends Phaser.Scene {
 							y: clickY
 						},
 						body: body,
-						stiffness: 0.015,
+						stiffness: 0.0,
 						damping: 0.005 * this.draggingBall.radius,
 					} );
 				}
@@ -222,7 +207,11 @@ class BallScene extends Phaser.Scene {
 	}
 
 	useBall( ball ) {
-		if ( app.add( ball.btext ) ) this.destroyBall( ball );
+		if ( app.add( ball.btext ) ) {
+		  this.destroyBall( ball );
+		} else {
+		  ball.setPosition( this.scale.width / 2, this.scale.height / 2 );
+		}
 	}
 
 	destroyBall( ball ) {
@@ -247,11 +236,8 @@ class BallScene extends Phaser.Scene {
 		// 在网格位置周围添加随机偏移，确保在左侧区域内
 		const x = ( col + 1 ) * cellWidth + Phaser.Math.Between( -cellWidth / 3, cellWidth / 3 );
 		const y = ( row + 1 ) * cellHeight + Phaser.Math.Between( -cellHeight / 3, cellHeight / 3 );
-
-		// 确保x坐标不超过分隔线
-		const finalX = Math.min( x, this.dividerX - 20 ); // 留出一些边距
 		return {
-			x: finalX,
+			x: x,
 			y: y,
 		}
 	}
@@ -270,7 +256,7 @@ class BallScene extends Phaser.Scene {
 
 		// 创建网格布局（只在左侧80%区域）
 		const gridSize = Math.ceil( Math.sqrt( app.brand.length ) );
-		const cellWidth = this.dividerX / ( gridSize + 1 );
+		const cellWidth = this.scale.width / ( gridSize + 1 );
 		const cellHeight = this.scale.height / ( gridSize + 1 );
 
 		// 根据brand创建新的小球
@@ -284,7 +270,7 @@ class BallScene extends Phaser.Scene {
 		}
 
 		//调整至合适的大小
-		let s = this.dividerX * this.scale.height;
+		let s = this.scale.width * this.scale.height;
 		if ( this.maxBallsWidth > s ) {
 			this.balls.map( ball => {
 				this.sizeScale = s / this.maxBallsWidth;
@@ -299,9 +285,11 @@ class BallScene extends Phaser.Scene {
 	}
 
 	createBallWithText( x, y, text ) {
+	  
 		// 根据原子序数计算半径，使用对数函数使大小差距更小
 		const atomic = chemist.elements[ text ]?.atomic || 0.1 / prop[ text ] || 1;
-		const radius = Math.floor( 10 + Math.log2( atomic ) * 5 ); // 基础大小20，每增加一倍原子序数增加5像素
+		const radius = Math.floor( 15 + Math.log2( atomic ) * 3 ); // 基础大小15，每增加一倍原子序数增加3像素
+		y = Math.max(y, 5 + radius);
 		let color = colors[ text ] || "#DDDDDD";
 		color = Phaser.Display.Color.HexStringToColor( color ).color;
 		this.maxBallsWidth += radius * radius * 4;
@@ -312,7 +300,7 @@ class BallScene extends Phaser.Scene {
 				restitution: 0.9, // 保持一定弹性
 				friction: 0.01, // 保留少量摩擦力
 				frictionAir: 0.01, // 保留少量空气阻力
-				density: Math.log2( radius ) * 0.001, // 密度与半径成正比
+				density: Math.log2( radius ) * 0.002, // 密度与半径成正比
 				chamfer: {
 					radius: 5
 				},
@@ -326,7 +314,7 @@ class BallScene extends Phaser.Scene {
 
 		// 设置更小的随机初始速度和更随机的角度
 		const angle = Phaser.Math.Between( 0, 360 );
-		const speed = Phaser.Math.Between( 3, 6 ); // 增加初始速度
+		const speed = Phaser.Math.Between( 2, 4 );
 
 		// 将角度转换为弧度并计算x和y方向的速度分量
 		const angleInRadians = Phaser.Math.DegToRad( angle );
@@ -375,9 +363,6 @@ class BallScene extends Phaser.Scene {
 		this.balls.push( ball );
 	}
 
-	update() {
-		// 更新逻辑
-	}
 }
 
 // 创建游戏配置

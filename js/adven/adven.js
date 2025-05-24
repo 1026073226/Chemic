@@ -67,7 +67,6 @@ const POWERUPS = {
 	}
 };
 const CURRENT_EFFECTS = {};
-const breakFrame = ( 1 - QUALITY ) * 10;
 if ( acts ) {
 	actList = Object.keys( acts );
 }
@@ -270,6 +269,7 @@ class MainGameScene extends Phaser.Scene {
 		this.setupPowerups();
 		this.lowFPS = [];
 		this.sumFPS = 0;
+		this.startTime = 0;
 	}
 
 	init( data ) {
@@ -302,7 +302,7 @@ class MainGameScene extends Phaser.Scene {
 			.userAgent );
 
 		if ( this.isMobile ) {
-			QUALITY = 0.2;
+			MAX_PARTICLES = Math.round(MAX_PARTICLES * 0.8);
 		} else {
 			this.changeControls();
 		}
@@ -434,11 +434,11 @@ class MainGameScene extends Phaser.Scene {
 			0, // 水平偏移
 			1, // 垂直偏移
 			2, // 模糊强度
-			0.15, // 强度
-			4 * QUALITY
+			0.2, // 强度
+			6 * QUALITY
 		);
 
-		let fxP = this.player.postFX.addGlow( this.SPELL_COLOR, 1, 0, false, 0.05 * QUALITY, 20 );
+		let fxP = this.player.postFX.addGlow( this.SPELL_COLOR, 1, 0, false, 0.1 * QUALITY, 20 );
 		// 添加呼吸效果
 		this.tweens.add( {
 			targets: fxP,
@@ -942,8 +942,8 @@ class MainGameScene extends Phaser.Scene {
 					this.player.y,
 					this.SPELL_COLOR,
 					angle,
-					Phaser.Math.Between( 800, 1600 ) * GAME_FACTOR, //速度
-					Phaser.Math.Between( 600, 1000 ) * GAME_FACTOR //生命周期
+					Phaser.Math.Between( 600, 1200 ) * GAME_FACTOR, //速度
+					Phaser.Math.Between( 800, 1200 ) * GAME_FACTOR //生命周期
 				);
 				this.cameras.main.shake( 20, 0.008 );
 			}
@@ -1082,16 +1082,25 @@ class MainGameScene extends Phaser.Scene {
 			}
 		}
 	}
+	
+	computeScrollY() {
+	  let scy = this.player.y - this.scale.height / 2;
+	  let ascy = Math.abs( scy );
+	  let ay = this.scale.height / 2;
+	  if( ascy >= ay / 2 ) {
+	    return scy * (( ascy - ay / 2 ) / ay / 2);
+	  } else {
+	    return 0;
+	  }
+	}
 
 	update( time, delta ) {
 		if ( this.sumFPS == 0 ) {
 			this.startTime = time;
 		}
-		if ( ( this.sumFPS + 1 ) % ( 11 - breakFrame ) == 0 ) {
-			console.log( "break" );
-			return;
-		}
-
+		
+    this.sumFPS ++;
+    
 		// 背景滚动
 		this.bgLayer.tilePositionX = this.cameras.main.scrollX * 0.1;
 
@@ -1105,7 +1114,7 @@ class MainGameScene extends Phaser.Scene {
 
 		//显示fps
 		const afps = game.loop.actualFps.toFixed( 1 );
-		const vfps = ( this.sumFPS / ( time - this.startTime ) * 1000 ).toFixed( 1 );
+		const vfps = ( this.sumFPS / ( time - this.startTime + 1 ) * 1000 ).toFixed( 1 );
 		const ufps = ( 1000 / delta ).toFixed( 1 );
 		this.fpsText.setText( `FPS: ${afps}/${vfps}/${ufps}` );
 		if ( !this.lowm ) {
@@ -1122,6 +1131,7 @@ class MainGameScene extends Phaser.Scene {
 		}
 		// 相机跟随
 		this.cameras.main.scrollX = this.player.x - this.scale.width / 2;
+		this.cameras.main.scrollY = this.computeScrollY();
 
 		//区块处理
 		const chunkIndex = ( this.player.x + this.scale.width / 2 ) / this.CHUNK_WIDTH;
@@ -1140,7 +1150,7 @@ class MainGameScene extends Phaser.Scene {
 		this.checkFall();
 		// 新增技能冷却逻辑
 		if ( this.spellCooldown > 0 ) {
-			this.spellCooldown -= 0.3;
+			this.spellCooldown -= 0.3 / ufps * 60;
 			this.cooldownBar.clear()
 				.fillStyle( 0x888888, 0.3 )
 				.fillRect( 80 * GAME_FACTOR, 150 * GAME_FACTOR, 200 * GAME_FACTOR, 20 )
@@ -1537,8 +1547,8 @@ const config = {
 	antialias: false,
 	parent: 'game-container',
 	fps: {
-		limit: 60,
-		target: 24 + 30 * QUALITY,
+		limit: 66,
+		target: 60,
 		min: 24
 	},
 	renderer: {

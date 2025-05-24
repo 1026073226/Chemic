@@ -12,23 +12,35 @@
 	<body>
 		<img src="img/fabric.jpg" id="background" />
 		<div id="app">
-			<button id="present" @click="getPresent" :disabled="!present.require"
-				:style="'filter: grayscale(' + ( brand.includes( present.require ) ? 0 : 1) + ');'">🎁<span
-					v-html="present.require"></span></button>
+		  <button @click="changeStrds" id="strds">↺</button>
+		  <button id="jjb" v-show="equi.jjb" @click="specialEqui('jjb')">
+		    <img :src="'img/equi/jjb' + ( usingt.jjb == usingt.jjbnom ? '' : '-full' ) + '.icon.png'" loading="lazy" />
+		  </button>
+			<button id="present" @click="getPresent" :disabled="!present.require" :style="'filter: grayscale(' + ( brand.includes( present.require ) ? 0 : 1) + ');'">🎁
+				<span v-html="present.require"></span></button>
 			<button id="ball" @click="change('ballm', !ballm)">🧿</button>
-			<div id="rounds">
-				回合 熵值 元素力
-				<br />
-				{{msg.p1e}}/{{msg.p2e}}&nbsp;
-				{{ (settings.sht ? (msg.ht1 + "/" + msg.ht2) : "") }}&nbsp;
-				{{ (settings.sf ? (force + "/" + fcost) : "") }}&nbsp;
-				{{ settings.senv ? env.now.icon : "" }}&nbsp;
-			</div>
-			<div class="task-list" @click="changeTaskList">
-				当前任务: <span v-html="quests.length > 0 ? quests[0].f : '无'"></span>
-				<span v-if="quests.length > 0">{{quests[0].t}}元素力</span>
+			<table id="rounds" border="0" v-show="!strds">
+				<tr>
+				  <th>回合</th>
+				  <th v-if="settings.sht">熵值</th>
+				  <th v-if="settings.sf">元素力</th>
+				  <th v-if="settings.senv">环境</th>
+				</tr>
+				<tr>
+				  <td>{{msg.p1e}}/{{msg.p2e}}</td>
+				  <td v-if="settings.sht">{{ msg.ht1 + "/" + msg.ht2 }}</td>
+				  <td v-if="settings.sf">{{ force + "/" + fcost }}</td>
+				  <td v-if="settings.senv">{{ env.now.icon }}</td>
+				  <td>({{quests.length}})</td>
+				</tr>
+			</table>
+			<div class="task-list" id="task" v-show="strds">
+        <span v-html="quests.length > 0 ? quests[0].f : '无'"></span>
+				<span v-if="quests.length > 0">{{quests[0].t}}</span>
+				({{quests.length}})
+				<div class="task-drop" @click="changeTaskList">﹀</div>
 				<div class="task-dropdown"
-					:style="'height:' + (taskListOpen ? quests.length * 2 + 'em' : '0') + ';opacity:' + (taskListOpen ? '0.8' : '0')">
+					:style="'height:' + (taskListOpen ? quests.length * 2 + 'em' : '0') + ';opacity:' + (taskListOpen ? '0.8' : '0')" @click="changeTaskList">
 					<div v-for="(quest, index) in quests" :key="index" class="task-item">
 						<span v-html="quest.f"></span>
 						<span>{{quest.t}}元素力</span>
@@ -104,7 +116,24 @@
 								</button>
 								<br />
 								<div class="sidebar">
-									{{value.intro}}
+								  <div v-html="value.intro"></div>
+								  <br />
+                <table v-if="!value.special">
+								  <tr>
+								    <th>熵增</th>
+								    <th>熵减</th>
+								    <th>成功率</th>
+								    <th>环境</th>
+								  </tr>
+								  <tr>
+								    <td>{{equiAttrFormatter(value.effect.exo * 100 - 100)}}</td>
+								    <td>{{equiAttrFormatter(value.effect.end * 100 - 100)}}</td>
+								    <td>{{equiAttrFormatter(value.effect.suc)}}</td>
+								    <td>
+								      <s v-for="item in value.effect.prevent">{{chemist.env[item].icon}}</s>
+								    </td>
+								  </tr>
+								</table>
 								</div>
 								<div style="background-image: url(img/tbc.png)" class="bg"
 									@click="showAct(key, value, $event, true)"></div>
@@ -137,6 +166,17 @@
 											{{value.xp}} / {{Math.round(1000 * prop[key])}}
 										</span>
 									</div>
+									<br />
+									<table v-if="!value.special">
+								  <tr>
+								    <th>概率</th>
+								    <th>成功率</th>
+								  </tr>
+								  <tr>
+								    <td>{{equiAttrFormatter( (prop[key] - window.prop[key]) * 100 )}}</td>
+								    <td>{{equiAttrFormatter(Math.pow( acts[ key ].lvl * 3, 0.8 ))}}</td>
+								  </tr>
+								</table>
 								</div>
 								<button class="btn"
 									style="position: fixed;right: 30px;bottom: 100px;z-index: 18;width: 60px;height: 30px;background-color: #DC5853;color: #FFF;line-height: 30px;box-shadow: 0 1px 5px #CA7676;border: 1px solid #AA4C4D"
@@ -437,8 +477,7 @@
 					</div>
 					<hr />
 					<span class="n">版本</span>
-					<span class="setInp n"
-						onclick="open('https://github.com/1026073226/Chemic/releases')">{{version}}&nbsp;</span>
+					<span class="setInp n">{{version}}&nbsp;</span>
 					<hr />
 					<button @click="reset" class="fullBtn">重新开始</button>
 					<hr />
@@ -458,7 +497,7 @@
 				<div id="area">
 					<span id="valence">{{format(pressedVal)}}</span>
 					<b v-html="press(text)" @click="clear()" id="showEle"></b>
-					<i v-html="((this.alting ? '(' : '') + this.press( this.alts ))"></i>
+					<i v-html="((this.alting ? '(' : '') + this.press( this.alts ))" id="alter"></i>
 					<button @click="alt(true)" style="background-color: #FAD" v-show="!alting">(</button>
 					<button @click="alt(false)" style="background-color:#DAF" v-show="alting">)</button>
 					<button
@@ -495,9 +534,7 @@
 				</div>
 			</div>
 			<div id="tip"></div>
-			<div id="conf">
-
-			</div>
+			<div id="conf"></div>
 			<div id="vr" v-if="srm">
 				<iframe src="readme.html"></iframe>
 			</div>
@@ -519,7 +556,6 @@
 	<script src="js/public/anima.js"></script>
 	<script src="js/public/dic.js"></script>
 	<script src="js/public/phaser.min.js"></script>
-	<script src="js/public/lodash.min.js"></script>
 	<script src="js/index/index.js"></script>
 	<script src="js/index/ball.js"></script>
 </html>

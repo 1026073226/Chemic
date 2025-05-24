@@ -3,7 +3,6 @@ Vue.config.errorHandler = function( err, vm, info ) {
 		return false;
 	}
 	prompt( info + "\n发生错误:", err );
-	return false;
 };
 const MOD_FILES = {};
 const FR = new FILE_TOOLS();
@@ -28,6 +27,7 @@ var app = new Vue( {
 	el: "#app",
 
 	data: {
+	  strds: false,
 		taskListOpen: false,
 		fLoader: true,
 
@@ -46,7 +46,14 @@ var app = new Vue( {
 				prevent: [],
 			},
 			added: false,
-
+      jjb: JSON.stringify({
+        text: {},
+        val: []
+      }),
+      jjbnom: JSON.stringify({
+        text: {},
+        val: []
+      }),
 		},
 
 		detailsQue: {
@@ -215,7 +222,7 @@ var app = new Vue( {
 		quests: [],
 		questsCounter: 0,
 
-		version: "17.5_beta",
+		version: "17.7_beta",
 
 		cannext: true,
 
@@ -256,7 +263,7 @@ var app = new Vue( {
 		this.a = new Anima();
 		this.chemist = chemist;
 		this.colors = colors;
-		this.prop = prop;
+		this.prop = JSON.parse(JSON.stringify(prop));
 		this.goodsSet();
 		this.initWorker();
 		this.loadSettings();
@@ -285,6 +292,26 @@ var app = new Vue( {
 	},
 
 	methods: {
+	  specialEqui( effect ) {
+	    switch ( effect ) {
+	      case "jjb":
+	        this.playSound( "water", false );
+	        this.a.play(this.d.$("#showEle"), "jslidein 384ms");
+	        setTimeout( () => {
+	          let temp = JSON.stringify( {
+	            text: this.text,
+	            val: this.val,
+	          } );
+            let omsg = JSON.parse( this.usingt.jjb );
+	          this.text = omsg.text || {};
+	          this.val = omsg.val || [];
+	          this.usingt.jjb = temp;
+	          this.a.play(this.d.$("#showEle"), "jslideout 384ms");
+	          this.matchSimilarMk();
+	        }, 384);
+	        break;
+	    }
+	  },
 		init() {
 			dicpreloader.then( res => {
 				if ( this.loaded < 100 ) this.loaded = 90;
@@ -296,6 +323,7 @@ var app = new Vue( {
 				this.checkVersion();
 				this.bgmSet();
 				this.fxSet();
+				this.setLvl();
 				if ( this.settings.ac ) this.tryFindHost();
 				if ( this.settings.an ) {
 					this.themeSet();
@@ -626,8 +654,8 @@ var app = new Vue( {
 			let timein = 206;
 			if ( key === "ballm" && value ) {
 				this.balls.update();
+				this.balls.resize();
 				timein = 452;
-				setTimeout( this.balls.resize, 290 );
 			}
 			let a = ( value ? "slideout " + timein + "ms" : "slidein 286ms" );
 			this.playSound( "ka" );
@@ -769,17 +797,23 @@ var app = new Vue( {
 			} else if ( !v && i > -1 ) {
 				v = this.brand[ i ];
 			}
+			let keys = Object.keys( this.text );
+		  let lastone = keys[ keys.length - 1 ];
 			if ( v in this.chemist.elements ) {
+			  if( v == lastone && Object.values( this.chemist.ion ).includes( lastone ) ) {
+			    delete this.text[ lastone ];
+					lastone = "(" + lastone + ")";
+					v = lastone;
+					this.text[ lastone ] = 1;
+			  }
 				this.addInObj( ( this.alting ? this.alts : this.text ), v );
-				this.val.push( this.chemist.elements[ v ].valence );
+				this.val.push( this.chemist.elements[ v.replaceAll(/\(|\)/g, "") ].valence );
 			} else {
 				v = Number( v );
-				let keys = Object.keys( this.text );
-				let lastone = keys[ keys.length - 1 ];
-				if ( this.chemist.ion.hasOwnProperty( lastone ) ) {
+				if ( Object.values( this.chemist.ion ).includes( lastone ) ) {
 					delete this.text[ lastone ];
 					lastone = "(" + lastone + ")";
-					this.text[ lastone ] = 1;
+					this.text[ lastone ] = 1 + v;
 				}
 				if ( lastone == undefined ) {
 					this.tip( "数字不能在首位" );
@@ -801,13 +835,14 @@ var app = new Vue( {
 					once: true
 				} );
 			} else {
+			  setTimeout(this.matchSimilarMk, 0);
 				return this.brand.splice( i, 1 );
 			}
-			this.matchSimilarMk();
+			setTimeout(this.matchSimilarMk, 0);
 			return true;
 		},
 		matchSimilarMk() {
-			this.mkMatcher.postMessage( [ this.press( this.text ), this.chemist.mk, "mk" ] );
+			this.mkMatcher.postMessage( [ this.press(this.text), this.chemist.mk, "mk" ] );
 		},
 		addInObj( obj, v ) {
 			if ( v in obj ) {
@@ -919,7 +954,7 @@ var app = new Vue( {
 			this.proMk = [];
 			setTimeout( function() {
 				this.val = [];
-				this.text = [];
+				this.text = {};
 			}.bind( this ), 286 );
 			if ( this.connectType != 1 ) {
 				this.newBrand();
@@ -934,7 +969,7 @@ var app = new Vue( {
 			this.pushing = true;
 			this.inter.new = setInterval( function() {
 					if ( i < this.perNewBrand ) {
-						this.brand.push( this.random( prop ) );
+						this.brand.push( this.random( this.prop ) );
 					} else {
 						this.pushing = false;
 						this.balls.update();
@@ -961,7 +996,7 @@ var app = new Vue( {
 			}
 			let z = this.randint( 1, 10 );
 			this.force += z;
-			this.tip( "元素力 +" + z );
+			this.tip( "元素力 +" + z, true );
 		},
 		random( p ) {
 			let s = 0;
@@ -1035,7 +1070,7 @@ var app = new Vue( {
 				}.bind( this ) );
 				targetElement.open.style.display = "inline-block";
 				this.inter.menu = setTimeout( () => {
-						targetElement.open.style.width = "calc(10% - 6px)";
+						targetElement.open.style.width = "calc(10vw - 6px)";
 						targetElement.open.style.opacity = 1;
 					},
 					132 );
@@ -1048,7 +1083,7 @@ var app = new Vue( {
 			} else {
 				//targetElement.open.style.display = "inline";
 				this.inter.menu = setTimeout( () => {
-					targetElement.open.style.width = "calc(10% - 6px)";
+					targetElement.open.style.width = "calc(10vw - 6px)";
 					targetElement.open.style.opacity = 1;
 				}, 0 );
 				let nButton = targetElement.open.querySelector( ".menuBtn:nth-child(5)" );
@@ -1061,7 +1096,7 @@ var app = new Vue( {
 			if ( method ) {
 				let k = Math.ceil( this.maked[ i ].split( "" ).length / 2 * ( 1 + this.attrs.dj * 0.1 ) );
 				this.force += k;
-				this.tip( "元素力 <span style='color:#AFA'>+" + k );
+				this.tip( "元素力 <span style='color:#AFA'>+" + k, true );
 			} else {
 				this.addInObj( this.f, this.maked[ i ] );
 				this.matcher.postMessage( [ this.maked, this.chemist.x ] );
@@ -1078,16 +1113,19 @@ var app = new Vue( {
 		startRec( e ) {
 			e.target.style.backgroundColor = "#8A8";
 			this.inter.rec = setInterval( () => {
+				if( this.maked.length == 0 ) { clearInterval( this.inter.rec );
+				  return;
+				}
 				const targetElement = this.d.$$( ".mades" )[ 0 ];
 				let k = Math.ceil( this.maked[ 0 ].split( "" ).length / 2 * ( 1 + this.attrs.dj *
 					0.1 ) );
 				this.force += k;
-				this.tip( "元素力 <span style='color:#AFA'>+" + k );
+				this.tip( "元素力 <span style='color:#AFA'>+" + k, true );
 				this.playSound( "ga" );
-				this.a.play( targetElement, "slidein 186ms", 0 );
+				this.a.play( targetElement, "jslidein 252ms", 0 );
 				setTimeout( function() {
 					this.removeMaked( 0, targetElement );
-				}.bind( this ), 186 );
+				}.bind( this ), 252 );
 			}, 300 );
 		},
 		stopRec( e ) {
@@ -1183,7 +1221,7 @@ var app = new Vue( {
 						return;
 					}
 					this.t = this.chemist.x[ i ];
-					this.t.map( e => {
+					this.t.t.map( e => {
 						this.isQuest( e );
 					} );
 					return;
@@ -1204,7 +1242,7 @@ var app = new Vue( {
 				"slidein 386ms" );
 			setTimeout( function() {
 					this.val = [];
-					this.text = [];
+					this.text = {};
 				}.bind( this ),
 				386 );
 		},
@@ -1568,7 +1606,7 @@ var app = new Vue( {
 			this.force += k;
 			setTimeout( () => {
 					this.removeMaked( i );
-					this.tip( "元素力 <span style='color:#AFA'>+" + k );
+					this.tip( "元素力 <span style='color:#AFA'>+" + k, true );
 					this.playSound( "ga" );
 				},
 				0 );
@@ -1864,9 +1902,9 @@ var app = new Vue( {
 				this.removeMaked( i );
 				v.xp++;
 				this.playSound( "cilllllll", false );
-				if ( v.xp >= prop[ k ] * 1000 ) {
+				if ( v.xp >= this.prop[ k ] * 1000 ) {
 					v.lvl++;
-					v.xp -= prop[ k ] * 1000;
+					v.xp -= this.prop[ k ] * 1000;
 					this.playSound( "liang", false );
 				}
 				this.setLvl( k );
@@ -1993,7 +2031,7 @@ var app = new Vue( {
 					let m = r[ this.randint( 0, r.length - 1 ) ];
 					let z = this.chemist.equi[ m ];
 					if ( this.equi.hasOwnProperty( m ) ) {
-						this.crystal += 99;
+						this.crystal += 30;
 					} else {
 						this.equi[ m ] = z;
 					}
@@ -2058,12 +2096,13 @@ var app = new Vue( {
 			this.impeQue = [];
 			this.drawQue = [];
 			if ( this.crystal < 10 ) {
-				this.confirm( "晶体不足，是否使用300元素力购买?", ( t ) => {
+			  let rx = 10 - this.crystal;
+				this.confirm( "晶体不足，是否使用" + 30 * rx + "元素力购买?", ( t ) => {
 					if ( t ) {
-						if ( this.force >= 300 ) {
-							this.force -= 300;
-							this.crystal += 10;
-							this.tip( "购买了: 晶体*10" );
+						if ( this.force >= 30 * rx ) {
+							this.force -= 30 * rx;
+							this.crystal += rx;
+							this.tip( "购买了: 晶体*" + rx );
 						} else {
 							this.tip( "元素力不足" );
 							this.playSound( "duong", false );
@@ -2146,6 +2185,7 @@ var app = new Vue( {
 			value ) {
 			this.playSound( "cilllllll",
 				false );
+			if ( value.special ) return;
 			if ( this.usingt.name != value.name ) {
 				if ( this.usingt.added ) {
 					this.addtEffect();
@@ -2277,7 +2317,7 @@ var app = new Vue( {
 		},
 		altAdd( item ) {
 			let x = this.unhas( this.brand, item.diff );
-			if ( x.length === 0 ) {
+			if ( x.length === 0  ) {
 				item.diff.map( diff => {
 					this.add( diff );
 				} );
@@ -2285,6 +2325,7 @@ var app = new Vue( {
 				this.matchSimilarMk();
 				setTimeout( () => {
 					this.d.$( "#showEle" ).innerHTML = item.mk;
+					this.balls.update();
 				}, 0 );
 			} else {
 				this.tip( "缺少 " + x.toString(), true );
@@ -2332,14 +2373,14 @@ var app = new Vue( {
 			}
 			const oMap = new Map( aMap );
 			const valuesRegex = new RegExp( `(${Object.keys(this.chemist.ion).join('|')})`, 'g' );
-			b = b.toString().replace( valuesRegex, ( item ) => {
+			b = JSON.parse( JSON.stringify(b).replace( valuesRegex, ( item ) => {
 				let ion = this.chemist.ion[ item ];
 				if ( oMap.has( ion ) && oMap.get( ion ) > 0 ) {
 					oMap.set( ion, oMap.get( ion ) - 1 );
 					return ion;
 				}
 				return item;
-			} ).split( "," );
+			} ) );
 			for ( let item of b ) {
 				if ( aMap.has( item ) && aMap.get( item ) > 0 ) {
 					// 如果元素在数组 a 中，减少其计数
@@ -2354,6 +2395,29 @@ var app = new Vue( {
 		changeTaskList() {
 			this.taskListOpen = !this.taskListOpen;
 			this.playSound( "di" );
+		},
+		changeStrds() {
+		  this.playSound("huu");
+		  if(this.strds) {
+		    this.a.play(this.d.$("#task"), "rotateYto 452ms");
+		    setTimeout(() => {
+		      this.strds = !this.strds;
+		      this.a.play(this.d.$("#rounds"), "rotateYback 452ms");
+		    }, 452);
+		  } else {
+		    this.a.play(this.d.$("#rounds"), "rotateYto 452ms");
+		    setTimeout(() => {
+		      this.strds = !this.strds;
+		      this.a.play(this.d.$("#task"), "rotateYback 452ms");
+		    }, 452);
+		  }
+		},
+		equiAttrFormatter( num ) {
+		  if( num > 0 ) {
+		    return "+" + num.toFixed(2);
+		  } else {
+		    return num.toFixed(2);
+		  }
 		},
 	},
 

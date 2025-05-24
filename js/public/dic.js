@@ -69,6 +69,11 @@ const chemist = {
         ],
       },
       intro: "常见的反应容器之一，可以滴定试剂，增加反应成功率，同时也可以促进试剂间反应，增加反应效率。同时，瓶颈较长，可以防止液体在加热过程中溅出，保证实验安全。",
+    },
+    jjb: {
+      name: "基基的杯子",
+      special: true,
+      intro: "除了水什么都装哦~"
     }
   },
   elements: {
@@ -1712,7 +1717,19 @@ const chemist = {
         "CO<sub>2</sub>": 1,
         "H<sub>2</sub>O": 1
       },
-      "y": -329 // 261+44+18=323 → 取整
+      "y": -323 // 261+44+18=323 → 取整
+    },
+    {
+      "f": {
+        "BaCO<sub>3</sub>": 1,
+        "HCl": 2
+      },
+      "t": {
+        "BaCl<sub>2</sub>": 1,
+        "CO<sub>2</sub>": 1,
+        "H<sub>2</sub>O": 1
+      },
+      "y": -215 // 261+44+18=323 → 取整
     },
     {
       "f": {
@@ -2449,8 +2466,12 @@ window.dicpreloader = new Promise((res) => {
   let i = 0;
   let cx = setInterval(() => {
     if (i < chemist.x.length) {
-      chemist.mk.add(...Object.keys(chemist.x[i].f));
-      chemist.mk.add(...Object.keys(chemist.x[i].t));
+      Object.keys(chemist.x[i].f).map( mk => {
+          chemist.mk.add(mk);
+        } );
+      Object.keys(chemist.x[i].t).map( mk => {
+          chemist.mk.add(mk);
+        } );
       i++;
     } else {
       clearInterval(cx);
