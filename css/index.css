@@ -1284,3 +1284,23 @@ iframe {
   border-radius: 5px;
   padding: 3px;
 }
+
+dialog {
+  background-color: rgba(114, 114, 114, 0.5);
+  backdrop-filter: blur( 5px );
+  border-radius: 5px;
+  z-index: 99999;
+  border: none;
+  color: #FFF;
+}
+dialog[open] {
+  animation: jslideout 386ms;
+}
+
+#qtip {
+  background-color: rgba(233, 8, 89, 0.5);
+  height: 0;
+  font-size: 50%;
+  line-height: 0;
+  margin-left: 88vw;
+}

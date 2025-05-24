@@ -16,6 +16,11 @@ function destroyGame() {
 		game = null;
 	}
 }
+function showQtip() {
+  let qtip = document.getElementById('qtip');
+  qtip.show();
+}
+
 const acts = JSON.parse( new URLSearchParams( window.location.search ).get( "acts" ) );
 var actList = [
 	'O'
@@ -202,7 +207,7 @@ class PreloadScene extends Phaser.Scene {
 	}
 
 	createSquareTexture() {
-		const size = 8 * GAME_FACTOR; // 方形大小
+		const size = 12 * GAME_FACTOR; // 方形大小
 		const texture = this.textures.createCanvas( 'squareParticle', size, size );
 		const ctx = texture.context;
 		ctx.fillStyle = '#FFFFFF'; // 白色，后续通过tint着色
@@ -592,7 +597,7 @@ class MainGameScene extends Phaser.Scene {
 		enemy.update = () => {
 			//检测生命
 			if ( enemy.getData( "hitCount" ) >= enemy.getData( "hp" ) ) {
-				enemy.setVelocityX( 0 );
+			  enemy.disableBody();
 				this.tweens.add( {
 					targets: enemy,
 					alpha: 0,
@@ -692,7 +697,8 @@ class MainGameScene extends Phaser.Scene {
 					2 ), platform.y - 50, true, true )
 				.setTexture( type.texture )
 				.setData( 'type', type ) // 存储道具类型数据
-				.setGravityY( -2000 * GAME_FACTOR ); //重力设为0
+				.setGravityY( -2000 * GAME_FACTOR ) //重力设为0
+				.setScale( GAME_FACTOR );
 			// 添加小幅浮动动画
 			this.tweens.add( {
 				targets: powerup,
@@ -870,7 +876,7 @@ class MainGameScene extends Phaser.Scene {
 		if ( !this.rayGraphics || this.joystick.force <= 0 ) return;
 		// 每帧清空射线
 		this.rayGraphics.clear();
-		if ( this.joystick.force >= 100 * GAME_FACTOR && this.spellCooldown < 20 && this.rayTime < 110 ) {
+		if ( this.joystick.force >= 90 * GAME_FACTOR && this.spellCooldown < 20 && this.rayTime < 110 ) {
 			this.rayTime++;
 		} else if ( this.rayTime > 0 ) {
 			this.rayTime--;
@@ -1041,9 +1047,9 @@ class MainGameScene extends Phaser.Scene {
 		// 处理玩家受伤
 		this.tweens.add( {
 			targets: player,
-			x: player.x - 98,
-			y: player.y - 38,
-			duration: 284,
+			x: player.x - 48,
+			y: player.y - 34,
+			duration: 282,
 			ease: 'Sine.easeOut'
 		} );
 		this.player.body.velocity.y = 0;
@@ -1135,7 +1141,7 @@ class MainGameScene extends Phaser.Scene {
 
 		//区块处理
 		const chunkIndex = ( this.player.x + this.scale.width / 2 ) / this.CHUNK_WIDTH;
-		if ( chunkIndex - this.chunkIndex > 0.25 ) {
+		if ( chunkIndex - this.chunkIndex > 0.4 ) {
 			this.chunkIndex = chunkIndex;
 			if ( Phaser.Math.Between( 0, 5 ) < 3 ) {
 				this.generatePlatform();
