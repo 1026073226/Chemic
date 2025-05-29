@@ -52,7 +52,7 @@
 				<button @click="change('reaction', !reaction)">🧫</button>
 				<button @click="change('fty', !fty)">💥</button>
 				<button @click="change('h', !h)">📖</button>
-				<button @click="change('shop', !shop)">💰</button>
+				<button @click="change('shop', !shop)" v-show="connectType == 1">💰</button>
 				<button @click="change('draw', !draw)" v-show="connectType !== 1">🌠</button>
 			</div>
 			<div id="ballm" v-show="ballm" :style="'height:' + bottomlineHeight + 'px'">
@@ -180,7 +180,7 @@
 								</div>
 								<button class="btn"
 									style="position: fixed;right: 30px;bottom: 100px;z-index: 18;width: 60px;height: 30px;background-color: #DC5853;color: #FFF;line-height: 30px;box-shadow: 0 1px 5px #CA7676;border: 1px solid #AA4C4D"
-									@click="joinAdven">实验</button>
+									@click="joinAdven" v-show="connectType !== 1">实验</button>
 							</div>
 						</div>
 					</div>
@@ -280,7 +280,7 @@
 						%
 					</span>
 				</div>
-				<div>
+				<div style="width: 100%;overflow: auto">
 					<div class="notes" v-for="(value, key, index) in f" @click="save(f,false,true)">
 						<span class="n">{{value == 1 ? "" : value}}</span>
 						<b v-html="key" class="e"></b>
@@ -320,7 +320,10 @@
 					<br />
 					<span class="n">熵减: </span>
 					<b class="e" id="h2">{{h1.toFixed(1)}}</b>
-					<button class="fullBtn" id="stcry" @click="stcry">熵结晶</button>
+					<button class="fullBtn" id="stcry" @click="stcry" :disabled="Math.abs( h1 ) + Math.abs( h2 ) < 160">
+					  <div class="htp" :style="'opacity:0.6;background-color:#ADF;border-radius:5px;transform: translateY( -15px ) translateX( -50% );height: 30px;width:calc(' + Math.min( ( Math.abs( h1 ) + Math.abs( h2 ) ) / 1.6, 100 ) + '% - 20px)'"></div>
+					  <span style="position: absolute; left: 50%;transform: translateY( -15px );">结晶</span>
+					</button>
 					<div v-show="connectType === 1" id="enre">
 						<hr />
 						<span class="n">{{name.p1}}:{{Number(msg.ht1).toFixed(1)}}/{{maxh}}</span>

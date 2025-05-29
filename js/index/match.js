@@ -74,6 +74,7 @@ function difference( array, values ) {
 }
 
 function findSimilarMk( md, mks ) {
+  if ( md.length < 1 || mks.length < 1 ) return [];
 	const result = [];
 	const mda = splitCase( md );
 	mks.map( mk => {

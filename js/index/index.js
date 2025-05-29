@@ -222,7 +222,7 @@ var app = new Vue( {
 		quests: [],
 		questsCounter: 0,
 
-		version: "17.7_beta",
+		version: "17.8_beta",
 
 		cannext: true,
 
@@ -339,7 +339,7 @@ var app = new Vue( {
 				}
 				setTimeout( () => {
 					this.loaded = 100;
-					this.d.$( "#loadTp" ).addEventListener( "transitionend", () => {
+					setTimeout(  () => {
 						this.d.$( "#loadTp" ).style.opacity = 0;
 						this.inter.load = setTimeout( () => {
 							this.d.$( "#getIn" ).style.opacity = 1;
@@ -355,9 +355,7 @@ var app = new Vue( {
 									} );
 							}, 512 );
 						}, 1012 );
-					}, {
-						once: true
-					} );
+					}, 1012 );
 				}, 3000 );
 			}.bind( this );
 			window.addEventListener( "beforeunload", this.saveAllData );
@@ -800,11 +798,15 @@ var app = new Vue( {
 			let keys = Object.keys( this.text );
 		  let lastone = keys[ keys.length - 1 ];
 			if ( v in this.chemist.elements ) {
-			  if( v == lastone && Object.values( this.chemist.ion ).includes( lastone ) ) {
+			  if ( lastone ) {
+			    if( v == lastone && Object.values( this.chemist.ion ).includes( lastone ) ) {
 			    delete this.text[ lastone ];
 					lastone = "(" + lastone + ")";
 					v = lastone;
 					this.text[ lastone ] = 1;
+			  } else if ( v == lastone.replaceAll(/\(|\)/g, "") && Object.values( this.chemist.ion ).includes( lastone.replaceAll(/\(|\)/g, "") ) ) {
+			    v = lastone;
+			  }
 			  }
 				this.addInObj( ( this.alting ? this.alts : this.text ), v );
 				this.val.push( this.chemist.elements[ v.replaceAll(/\(|\)/g, "") ].valence );
@@ -813,7 +815,7 @@ var app = new Vue( {
 				if ( Object.values( this.chemist.ion ).includes( lastone ) ) {
 					delete this.text[ lastone ];
 					lastone = "(" + lastone + ")";
-					this.text[ lastone ] = 1 + v;
+					this.text[ lastone ] = 1;
 				}
 				if ( lastone == undefined ) {
 					this.tip( "数字不能在首位" );
@@ -1221,9 +1223,9 @@ var app = new Vue( {
 						return;
 					}
 					this.t = this.chemist.x[ i ];
-					this.t.t.map( e => {
+					for( let e in this.t.t ) {
 						this.isQuest( e );
-					} );
+					}
 					return;
 				}
 			}
@@ -2209,13 +2211,12 @@ var app = new Vue( {
 			this.addtEffect();
 		},
 		stcry() {
-			const n = Math.round( ( this.h1 + this.h2 ) / 320 + this.randint( 0, ( this.h1 + this.h2 ) /
-				640 ) );
+		  const f = Math.abs( this.h1 ) + Math.abs( this.h2 );
+			const n = Math.floor( f / 160 );
 			this.crystal += n;
 			this.tip( "凝聚晶体 " + n );
 			this.h1 = 0;
 			this.h2 = 0;
-
 		},
 
 		queryCom( query ) {
@@ -2316,9 +2317,10 @@ var app = new Vue( {
 			} );
 		},
 		altAdd( item ) {
-			let x = this.unhas( this.brand, item.diff );
+		  let uh = this.unhas( this.brand, item.diff );
+			let x = uh.result;
 			if ( x.length === 0  ) {
-				item.diff.map( diff => {
+				uh.pressb.map( diff => {
 					this.add( diff );
 				} );
 				item.diff = [];
@@ -2373,24 +2375,24 @@ var app = new Vue( {
 			}
 			const oMap = new Map( aMap );
 			const valuesRegex = new RegExp( `(${Object.keys(this.chemist.ion).join('|')})`, 'g' );
-			b = JSON.parse( JSON.stringify(b).replace( valuesRegex, ( item ) => {
+			b = b.toString().replace( valuesRegex, ( item ) => {
 				let ion = this.chemist.ion[ item ];
 				if ( oMap.has( ion ) && oMap.get( ion ) > 0 ) {
 					oMap.set( ion, oMap.get( ion ) - 1 );
 					return ion;
 				}
 				return item;
-			} ) );
+			} ).split(",");
 			for ( let item of b ) {
 				if ( aMap.has( item ) && aMap.get( item ) > 0 ) {
 					// 如果元素在数组 a 中，减少其计数
 					aMap.set( item, aMap.get( item ) - 1 );
-				} else {
+				} else if ( item ) {
 					// 如果元素不在数组 a 中，添加到结果数组
 					result.push( item );
 				}
 			}
-			return result;
+			return { result: result, pressb: b };
 		},
 		changeTaskList() {
 			this.taskListOpen = !this.taskListOpen;

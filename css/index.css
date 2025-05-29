@@ -1019,12 +1019,13 @@ iframe {
 	z-index: 5;
 	width: 2em;
 	height: 2em;
+	padding: 0;
+	margin: 0;
 }
 
 #jjb img {
-  height: 2em;
-  width: 2em;
-  object-fit: contain;
+  height: 100%;
+  width: 100%;
 }
 
 #ball {
@@ -1184,12 +1185,12 @@ iframe {
 #stcry {
 	height: 30px;
 	line-height: 30px;
-	background-color: #ADF;
+	background-color: rgba(0, 0, 0, 0);
 }
 
 #topline button {
 	border-radius: 2.5px;
-	width: 16.6666666%;
+	width: 20%;
 	margin: 0;
 	padding: 0;
 	height: 100%;

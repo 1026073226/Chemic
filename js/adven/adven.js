@@ -29,6 +29,7 @@ var loaded = 0;
 var bgm;
 var QUALITY = localStorage.QUALITY ? localStorage.QUALITY : 1;
 var MAX_PARTICLES = 100 * Math.sqrt( QUALITY );
+var CASTRAYTIME = 60;
 const settings = JSON.parse( localStorage.settings || "false" );
 const decos = [ "flower", "rock", "mushroom", "anthemy", "thick" ];
 //道具列表
@@ -52,12 +53,12 @@ const POWERUPS = {
 	shield: {
 		texture: 'powerup_shield',
 		duration: 1000,
-		effect( player ) {
+		effect( player, id ) {
 			CURRENT_EFFECTS.shield = {
 				color: "#65FEF8",
 				icon: "❄️",
 			};
-			this.shieldLooper = this.time.addEvent( {
+			this.shieldLoopers[ id ] = this.time.addEvent( {
 				callback: () => {
 					this.currentEntropy -= 0.1;
 				},
@@ -65,9 +66,9 @@ const POWERUPS = {
 				loop: true,
 			} );
 		},
-		clear( player ) {
+		clear( player, id ) {
 			CURRENT_EFFECTS.shield = null; // 清除状态
-			this.time.removeEvent( this.shieldLooper );
+			this.time.removeEvent( this.shieldLoopers[ id ] );
 		},
 	}
 };
@@ -187,7 +188,7 @@ class PreloadScene extends Phaser.Scene {
 			if ( r + 1 > this.bgmNum ) {
 				r--;
 			} else {
-				r++
+				r++;
 			}
 		}
 		this.currentBgmIndex = r;
@@ -275,6 +276,7 @@ class MainGameScene extends Phaser.Scene {
 		this.lowFPS = [];
 		this.sumFPS = 0;
 		this.startTime = 0;
+		this.shieldLoopers = {};
 	}
 
 	init( data ) {
@@ -595,6 +597,10 @@ class MainGameScene extends Phaser.Scene {
 		// 敌人AI行为
 		enemy.isGrounded = "borning";
 		enemy.update = () => {
+		  if ( Math.abs(enemy.x - this.player.x) > 2 * this.CHUNK_WIDTH ) {
+		    enemy.destroy();
+		    return;
+		  }
 			//检测生命
 			if ( enemy.getData( "hitCount" ) >= enemy.getData( "hp" ) ) {
 			  enemy.disableBody();
@@ -713,8 +719,9 @@ class MainGameScene extends Phaser.Scene {
 	// 新增道具碰撞处理逻辑
 	handlePowerUpCollision( player, powerup ) {
 		const type = powerup.getData( 'type' );
+		let id = new Date().getTime();
 		// 应用效果（业务逻辑核心）
-		type.effect( player );
+		type.effect( player, id );
 		// 添加视觉效果
 		this.add.tween( {
 			targets: player,
@@ -725,7 +732,7 @@ class MainGameScene extends Phaser.Scene {
 
 		// 定时恢复原始状态
 		this.time.delayedCall( type.duration, () => {
-			type.clear( this.player );
+			type.clear( this.player, id );
 		} );
 		// 回收道具
 		powerup.disableBody( true,
@@ -827,7 +834,7 @@ class MainGameScene extends Phaser.Scene {
 				this.rayGraphics.clear();
 				jump.style.pointerEvents = "auto";
 				spell.style.pointerEvents = "auto";
-				if ( this.rayTime > 100 && this.spellCooldown < 20 ) {
+				if ( this.rayTime > CASTRAYTIME && this.spellCooldown < this.MAX_COOLDOWN / 2 ) {
 					this.castRay();
 				}
 				this.rayTime = 0;
@@ -876,14 +883,14 @@ class MainGameScene extends Phaser.Scene {
 		if ( !this.rayGraphics || this.joystick.force <= 0 ) return;
 		// 每帧清空射线
 		this.rayGraphics.clear();
-		if ( this.joystick.force >= 90 * GAME_FACTOR && this.spellCooldown < 20 && this.rayTime < 110 ) {
+		if ( this.joystick.force >= 80 * GAME_FACTOR && this.spellCooldown < this.MAX_COOLDOWN / 2 && this.rayTime < CASTRAYTIME + 10 ) {
 			this.rayTime++;
 		} else if ( this.rayTime > 0 ) {
 			this.rayTime--;
 		}
-		if ( Math.abs( this.rayTime - 100 ) < 1 ) {
+		if ( Math.abs( this.rayTime - CASTRAYTIME ) < 1.1 ) {
 			this.sfx.budong.play();
-			this.cameras.main.shake( 30, 0.005 );
+			this.cameras.main.shake( 20, 0.01);
 		}
 		// 获取摇杆方向角度（弧度）
 		const angle = Phaser.Math.DegToRad( this.joystick.angle );
@@ -958,7 +965,7 @@ class MainGameScene extends Phaser.Scene {
 
 	castRay() {
 		// 重置冷却
-		this.spellCooldown = this.MAX_COOLDOWN;
+		this.spellCooldown = this.MAX_COOLDOWN / 2;
 		//播放音效
 		this.sfx.jiu.play();
 		let pcolor = Phaser.Display.Color.HexStringToColor( colors[ this.selectedChar ] || "#CCC" );
@@ -1248,7 +1255,7 @@ class MainGameScene extends Phaser.Scene {
 				this.rayGraphics.clear();
 				jump.style.pointerEvents = "auto";
 				spell.style.pointerEvents = "auto";
-				if ( this.rayTime > 100 && this.spellCooldown < 20 ) {
+				if ( this.rayTime > CASTRAYTIME && this.spellCooldown < this.MAX_COOLDOWN / 2 ) {
 					this.castRay();
 				}
 				this.rayTime = 0;
