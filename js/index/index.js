@@ -1423,15 +1423,15 @@ var app = new Vue( {
 			this.d.$( "#app" ).style.overflow = "hidden";
 			setTimeout( this.tip,
 				3000,
-				"[即将重新开始] 3s" );
+				"[即将重新开始] 3s", true );
 			setTimeout( this.tip,
 				4000,
 				"[即将重新开始] 2s",
-				false );
+				true );
 			setTimeout( this.tip,
 				5000,
 				"[即将重新开始] 1s",
-				false );
+				true );
 			setTimeout( this.reset,
 				6000 );
 		},
@@ -1591,7 +1591,7 @@ var app = new Vue( {
 				ht1: 0,
 				ht2: 0,
 			};
-			if ( this.connectType != 1 ) {
+			if ( this.connectType !== 1 ) {
 				if ( rel ) location = location;
 			}
 			axios.get( `http://${this.ip}:${this.port}/`, {
@@ -1606,6 +1606,9 @@ var app = new Vue( {
 				.catch( err => {
 					this.connectType = -1;
 					this.err = err;
+				} )
+				.finally( () => {
+				  if ( rel ) location = location;
 				} );
 		},
 		altRecycle() {
