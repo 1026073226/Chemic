@@ -1918,9 +1918,9 @@ var app = new Vue( {
 				this.removeMaked( i );
 				v.xp++;
 				this.playSound( "cilllllll", false );
-				if ( v.xp >= this.prop[ k ] * 1000 ) {
-					v.lvl++;
-					v.xp -= this.prop[ k ] * 1000;
+				if ( v.xp >= this.prop[ k ] * 333 ) {
+					v.lvl ++;
+					v.xp -= this.prop[ k ] * 333;
 					this.playSound( "liang", false );
 				}
 				this.setLvl( k );
