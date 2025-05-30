@@ -655,6 +655,9 @@ var app = new Vue( {
 				this.balls.resize();
 				timein = 452;
 			}
+			if ( key === "ballm" ) {
+			  this.balls.pruse( value );
+			}
 			let a = ( value ? "slideout " + timein + "ms" : "slidein 286ms" );
 			this.playSound( "ka" );
 			if ( value ) {
@@ -1302,7 +1305,7 @@ var app = new Vue( {
 				let k = Object.keys( this.chemist.env );
 				this.env.now = this.chemist.env[ k[ this.randint( 0, k.length - 1 ) ] ];
 				this.env.cd = this.env.now.dur;
-			} else if ( this.env.now.cost = "H<sub>2</sub>O" && this.randint( 0, 18 ) == 6 ) {
+			} else if ( this.env.now.cost == "H<sub>2</sub>O" && this.randint( 0, 18 ) == 6 ) {
 				let rx = this.maked.splice( this.randint( 0, this.maked.length - 1 ), 1 )[ 0 ];
 				this.matcher.postMessage( [ this.maked, this.chemist.x ] );
 				this.confirm( `环境潮湿，恭喜您成为"滑铲大蛇"，打碎了一瓶试剂(${rx})!` );
@@ -1345,6 +1348,10 @@ var app = new Vue( {
 				}
 			}
 			realh = Number( realh.toFixed( 1 ) );
+			if ( isNaN( realh ) || typeof realh != "number") {
+			  this.confirm( "发生了未知的错误，已为您自动拦截危险操作" );
+			  return;
+			}
 			let tipstr = ( nh > 0 ? ( "<span style='color:#AAF'>" + nh + "(" + realh + ")" ) : (
 				"<span style='color:#FAA'>" + ( -nh ) + "(" + -realh + ")" ) );
 			this.tip( ( h ? "制取: " : "反应: " ) + tipstr );
@@ -1642,6 +1649,10 @@ var app = new Vue( {
 			}
 			if ( localStorage.crystal ) {
 				this.crystal = Number( localStorage.crystal );
+				if ( typeof this.crystal != "number" || isNaN( this.crystal ) ) {
+			    this.confirm("发现水晶出现类型错误，不得不重置以恢复正常，已为您自动替换为1000！");
+			    this.crystal = 1000;
+			  }
 			}
 		},
 		opd() {
@@ -1721,7 +1732,7 @@ var app = new Vue( {
 				}, 400 );
 			}, 2198 );
 		},
-		confirm( msg, f = function() {}, ym = "确认", nm = "取消" ) {
+		confirm( msg, f = function() { return }, ym = "确认", nm = "取消" ) {
 			this.playSound( "ta" );
 			let t = this.d.$( "#conf" );
 			t.innerHTML = `
@@ -2383,15 +2394,19 @@ var app = new Vue( {
 				}
 				return item;
 			} ).split(",");
-			for ( let item of b ) {
+			b.map( ( item, index ) => {
+			  if ( !item ) {
+			    b.splice( index, 1 );
+			    return;
+			  }
 				if ( aMap.has( item ) && aMap.get( item ) > 0 ) {
 					// 如果元素在数组 a 中，减少其计数
 					aMap.set( item, aMap.get( item ) - 1 );
-				} else if ( item ) {
+				} else {
 					// 如果元素不在数组 a 中，添加到结果数组
 					result.push( item );
 				}
-			}
+			} );
 			return { result: result, pressb: b };
 		},
 		changeTaskList() {

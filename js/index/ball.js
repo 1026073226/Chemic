@@ -61,7 +61,14 @@ class BallScene extends Phaser.Scene {
 				} );
 				const wallBounds = this.wall.bounds;
 				this.matter.body.scale( this.wall, this.scale.width / (wallBounds.max.x - wallBounds.min.x), 1 );
-			}
+			},
+			pruse: ( value ) => {
+			  if ( value ) {
+			    this.game.resume();
+			  } else {
+			    this.game.pause();
+			  }
+			},
 		};
 
 		// 添加点击事件

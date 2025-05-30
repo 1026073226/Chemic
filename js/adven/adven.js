@@ -70,7 +70,21 @@ const POWERUPS = {
 			CURRENT_EFFECTS.shield = null; // 清除状态
 			this.time.removeEvent( this.shieldLoopers[ id ] );
 		},
-	}
+	},
+	crystal: {
+	  texture: "powerup_crystal",
+	  duration: -1,
+	  effect( player ) {
+	    this.crystal ++;
+	    CURRENT_EFFECTS.crystal = {
+	      color: "#FCEDE0",
+	      icon: this.crystal,
+	    };
+	  },
+	  clear( player ) {
+	    return;
+	  }
+	},
 };
 const CURRENT_EFFECTS = {};
 if ( acts ) {
@@ -277,6 +291,7 @@ class MainGameScene extends Phaser.Scene {
 		this.sumFPS = 0;
 		this.startTime = 0;
 		this.shieldLoopers = {};
+		this.crystal = 0;
 	}
 
 	init( data ) {
@@ -729,11 +744,12 @@ class MainGameScene extends Phaser.Scene {
 			yoyo: true,
 			duration: 200
 		} );
-
+    if ( type.duration > 0 ) {
 		// 定时恢复原始状态
-		this.time.delayedCall( type.duration, () => {
-			type.clear( this.player, id );
-		} );
+		  this.time.delayedCall( type.duration, () => {
+			  type.clear( this.player, id );
+		  } );
+    }
 		// 回收道具
 		powerup.disableBody( true,
 			true );
@@ -867,7 +883,7 @@ class MainGameScene extends Phaser.Scene {
 	quitGame() {
 		document.getElementById( "pause" ).remove();
 		this.scene.start( 'GameOverScene', {
-			force: Math.max( Math.round( this.player.x / 1500 - this.currentEntropy * 0.015, 0 ) )
+			force: Math.max( Math.round( this.player.x / 1500 - this.currentEntropy * 0.015 + this.crystal, 0 ) )
 		} );
 	}
 

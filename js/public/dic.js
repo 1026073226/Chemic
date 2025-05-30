@@ -276,7 +276,7 @@ const chemist = {
           10
         ]
       },
-      cost: "AgNO<sub>3</sub>",
+      cost: "NH<sub>4</sub>NO<sub>3</sub>",
       dur: 3
     },
     wet: {
